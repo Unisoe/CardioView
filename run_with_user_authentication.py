@@ -48,5 +48,4 @@ if __name__ == "__main__":
         main_window.show()
         app.exec()
         sys.exit(app.exec_()) #edithere
-        # Heehheee
     sys.exit(app.exec_())
