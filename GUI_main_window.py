@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 from patient_data_sqlite import new_entry, get_m_file
-from popup import NewUserDialog, NoPat
+from popup import NewUserDialog
 import RunProcessing
 import serial
 import struct
@@ -8,8 +9,6 @@ import struct
 
 class Ui_MainWindow(object):
     def __init__(self):
-        self.popup_nopat_window = None
-        self.popup_user_window = None
         self.send_to_mc = None
         self.new_user = None
         self.timer = None
@@ -295,7 +294,6 @@ class Ui_MainWindow(object):
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
                                                             "All Files (*);;Python Files (*.py)", options=options)
         if fileName:
-            # print(fileName)
             self.load_data.insert(fileName)
 
     def new_pat_info(self):
@@ -307,12 +305,12 @@ class Ui_MainWindow(object):
         new_entry(load_data, new_pat_name, new_pat_num, new_pat_date)
 
     def new_user_window(self):
+
         self.popup_user_window = NewUserDialog()
         self.popup_user_window.show()
         
     def no_pat_window(self):
-        self.popup_nopat_window = NoPat()
-        self.popup_nopat_window.show()
+        QMessageBox.about(self, "Error", "This patient does not exist.")
 
     def connect_to_model(self):
         ser = serial.Serial('COM3', 9600)  # Replace with the appropriate serial port

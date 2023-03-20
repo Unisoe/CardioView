@@ -1,7 +1,7 @@
 import sqlite3
 import shutil
 import os
-from popup import NewPatDialog, NoPat
+from PyQt5.QtWidgets import QMessageBox
 import base64
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -59,9 +59,10 @@ def new_entry(m_file_path, name, number, date):
     os.makedirs(database_path, exist_ok=True)
 
     if count == 1:
-        popup_pat_window = NewPatDialog() # edithere
-        popup_pat_window.show()
-        if popup_pat_window.result == 1:
+        from GUI_main_window import Ui_MainWindow
+        ret = QMessageBox.question(Ui_MainWindow, 'Error', "Patient already exists in the database",
+                                   QMessageBox.Yes | QMessageBox.No)
+        if ret == QMessageBox.No:
             cursor.close()
             conn.close()
 
@@ -73,7 +74,7 @@ def new_entry(m_file_path, name, number, date):
     shutil.copyfile(m_file_path, new_m_file_path)
 
     # Set the file permissions of the subdirectory to read and execute only for the owner
-    os.chmod(new_m_file_path, 0o700)
+
 
     # Insert new entry into the table
     cursor.execute('''

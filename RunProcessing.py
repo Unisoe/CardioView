@@ -79,7 +79,6 @@ def run_processing(patient_data, thresh, pat_num):
 
     # Get gif path and make it only accessible by user
     gif_path = get_gif_path(pat_num)
-    os.chmod(gif_path, 0o700)
 
     imageio.mimsave(gif_path, #need to send it to application save location
                     images, fps=10) # edithere update so that .gif is deleted upon closure of application

@@ -1,8 +1,5 @@
-from PyQt5.QtWidgets import QDialog, QLineEdit, QPushButton, QVBoxLayout, QLabel
-
+from PyQt5.QtWidgets import QDialog, QLineEdit, QPushButton, QVBoxLayout, QLabel, QMessageBox
 from user_sqlite import new_user
-
-
 
 class NewUserDialog(QDialog):
     def __init__(self):
@@ -37,50 +34,11 @@ class NewUserDialog(QDialog):
 
         # Check database
         if accepted == 0:
-            error_label = QLabel("Username already exists", self)
-            layout = self.layout()
-            layout.addWidget(error_label)
-            self.resize(self.sizeHint())
+            QMessageBox.about(self, "Error", "Username already exists")
         elif accepted == 1:
-            error_label = QLabel("Passwords do not match", self)
-            layout = self.layout()
-            layout.addWidget(error_label)
-            self.resize(self.sizeHint())
+            QMessageBox.about(self, "Error", "Passwords do not match")
         elif accepted == 2:
             self.accept()
         else:
             # display error message
-            error_label = QLabel("Unknown error", self)
-            layout = self.layout()
-            layout.addWidget(error_label)
-            self.resize(self.sizeHint())
-
-class NewPatDialog(QDialog):
-    def __init__(self):
-        super().__init__()
-        self.result = None
-        self.setWindowTitle("New Patient File")
-        overwrite_button = QPushButton("Overwrite Existing Data", self)
-        cancel_button = QPushButton("Cancel", self)
-        layout = QVBoxLayout(self)
-        layout.addWidget(overwrite_button)
-        layout.addWidget(cancel_button)
-        overwrite_button.clicked.connect(lambda: self.accept_with_result(0)) #edithere
-        cancel_button.clicked.connect(lambda: self.accept_with_result(1))
-        stylesheet = "QWidget { font-size: 30px; }"
-        self.setStyleSheet(stylesheet)
-
-    def accept_with_result(self, result):
-        self.result = result
-        self.accept()
-
-class NoPat(QDialog):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("No Patient File")
-        cancel_button = QPushButton("Ok", self)
-        layout = QVBoxLayout(self)
-        layout.addWidget(cancel_button)
-        cancel_button.clicked.connect(self.reject)
-        stylesheet = "QWidget { font-size: 30px; }"
-        self.setStyleSheet(stylesheet)
+            QMessageBox.about(self, "Error", "Unknown Error")
