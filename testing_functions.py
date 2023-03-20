@@ -18,7 +18,7 @@ date = '2000-01-01'
 # new_entry(m_file_path, name, number, date)
 # get_m_file(name, number)
 # get_gif_path(number)
-NewUserDialog(QDialog)
+# NewUserDialog(QDialog)
 
 # import os
 # from appdata import AppDataPaths

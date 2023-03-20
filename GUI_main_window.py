@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from patient_data_sqlite import new_entry, get_m_file
-from popup import NewUserDialog
+from popup import NewUserDialog, NoPat
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import RunProcessing
@@ -12,6 +12,8 @@ import struct
 
 class Ui_MainWindow(object):
     def __init__(self):
+        self.popup_nopat_window = None
+        self.popup_user_window = None
         self.send_to_mc = None
         self.new_user = None
         self.timer = None
@@ -309,8 +311,12 @@ class Ui_MainWindow(object):
         new_entry(load_data, new_pat_name, new_pat_num, new_pat_date)
 
     def new_user_window(self):
-        popup_user_window = NewUserDialog()
-        popup_user_window.show()
+        self.popup_user_window = NewUserDialog()
+        self.popup_user_window.show()
+        
+    def no_pat_window(self):
+        self.popup_nopat_window = NoPat()
+        self.popup_nopat_window.show()
 
     def connect_to_model(self):
         ser = serial.Serial('COM3', 9600)  # Replace with the appropriate serial port
@@ -339,8 +345,8 @@ class Ui_MainWindow(object):
         movie.start()  # edit here
 
         # Display patient info edithere
-        # text = f"Patient Name = {pat_name}\nPatient Number = {pat_num}\nData Entry Date = {date}"
-        # self.disp_patient.setPlainText(text)
+        text = f"Patient Name = {pat_name}\nPatient Number = {pat_num}\nData Entry Date = {date}"
+        self.disp_patient.setPlainText(text)
 
     def slider_value_changed(self, value): #edithere
         # Set the speed of the GIF based on the value of the slider

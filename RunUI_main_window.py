@@ -12,12 +12,3 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         sys.exit()
-
-
-
-# app = QtWidgets.QApplication(sys.argv)
-# # stylesheet = "QWidget { font-size: 30px; }"
-# # app.setStyleSheet(stylesheet)
-# main_window = MainWindow()
-# main_window.show()
-# app.exec()

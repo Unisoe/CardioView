@@ -9,7 +9,8 @@ from patient_data_sqlite import get_gif_path
 
 def run_processing(patient_data, thresh, pat_num):
     # Initiate variables and static values
-    ecg = loadmat(patient_data)
+    patient_data = patient_data.decode()
+    ecg = loadmat(patient_data) #need to take the
     array_data = np.array(ecg['array_data'])
     array_gain = np.zeros(112)
     array_data_nogain = np.zeros(array_data.shape)

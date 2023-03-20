@@ -1,8 +1,6 @@
 import sqlite3
 import shutil
 import os
-import sys
-from appdata import AppDataPaths
 from popup import NewPatDialog, NoPat
 import base64
 from cryptography.fernet import Fernet
@@ -37,9 +35,6 @@ def new_entry(m_file_path, name, number, date):
     # base_path = app_paths.app_data_path.replace('\\', '/')
     base_path = r'C:\Users\krist\OneDrive\Documents\School\8SEM-W2023\BME700 (Capstone)'
     database_path = os.path.join(base_path, f'patient_database')
-    if not os.path.exists(database_path):
-        os.mkdir(database_path)
-    os.makedirs(database_path, exist_ok=True)
 
     # Create table 'entries'
     cursor.execute('''
@@ -59,8 +54,12 @@ def new_entry(m_file_path, name, number, date):
                 ''', (number,))
     count = cursor.fetchone()[0]
 
+    if not os.path.exists(database_path):
+        os.mkdir(database_path)
+    os.makedirs(database_path, exist_ok=True)
+
     if count == 1:
-        popup_pat_window = NewPatDialog()
+        popup_pat_window = NewPatDialog() # edithere
         popup_pat_window.show()
         if popup_pat_window.result == 1:
             cursor.close()
@@ -70,11 +69,11 @@ def new_entry(m_file_path, name, number, date):
     new_m_file_path = os.path.join(database_path, f'{number}.m')
     gif_path = os.path.join(database_path, f'{number}.gif')
 
-    # Set the file permissions of the subdirectory to read and execute only for the owner
-    os.chmod(new_m_file_path, 0o700)
-
     # Move .m file to app location
     shutil.copyfile(m_file_path, new_m_file_path)
+
+    # Set the file permissions of the subdirectory to read and execute only for the owner
+    os.chmod(new_m_file_path, 0o700)
 
     # Insert new entry into the table
     cursor.execute('''
@@ -105,7 +104,7 @@ def get_m_file(ser_name, num):
                     ''', (num,))
     count = cursor.fetchone()[0]
 
-    if count == 0:
+    if count == 0: # edithere
         popup_nopat_window = NoPat()
         popup_nopat_window.show()
         cursor.close()
@@ -125,7 +124,7 @@ def get_m_file(ser_name, num):
     gif_path = f_patient.decrypt(gif_path_e)
     date = f_patient.decrypt(date_e)
 
-    if bytes(ser_name, 'utf-8') != f_patient.decrypt(name):
+    if bytes(ser_name, 'utf-8') != name: # edithere
         popup_nopat_window = NoPat()
         popup_nopat_window.show()
         cursor.close()
