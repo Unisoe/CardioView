@@ -1,11 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from patient_data_sqlite import new_entry, get_m_file
 from popup import NewUserDialog, NoPat
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import RunProcessing
-import numpy as np
-import os
 import serial
 import struct
 

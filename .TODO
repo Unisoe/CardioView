@@ -4,3 +4,9 @@
 4. figure out how to make the progress bars work?
 5. fix app scaling
 6.
+
+
+note: for using git:
+1. git add .
+2. git commit -m "comment"
+3. git push

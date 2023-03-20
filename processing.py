@@ -283,9 +283,6 @@ def processing(ecg, fs, user_thresh):
         for t in range(len(ecg)):
             if t == let_i[n]:
                 send_to_mc[t] = 1
-                a = t
-            # elif t != let_i[n]:
-            #     send_to_mc[t] = 0
 
     return send_to_mc
 

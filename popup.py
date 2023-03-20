@@ -1,7 +1,7 @@
-from PyQt5.QtWidgets import QApplication, QDialog, QLineEdit, QPushButton, QVBoxLayout, QLabel
-import RunUI_main_window
+from PyQt5.QtWidgets import QDialog, QLineEdit, QPushButton, QVBoxLayout, QLabel
+
 from user_sqlite import new_user
-import sys
+
 
 
 class NewUserDialog(QDialog):
@@ -77,11 +77,10 @@ class NewPatDialog(QDialog):
 class NoPat(QDialog):
     def __init__(self):
         super().__init__()
-        self.result = None
         self.setWindowTitle("No Patient File")
         cancel_button = QPushButton("Ok", self)
         layout = QVBoxLayout(self)
         layout.addWidget(cancel_button)
-        cancel_button.clicked.connect(self.reject())
+        cancel_button.clicked.connect(self.reject)
         stylesheet = "QWidget { font-size: 30px; }"
         self.setStyleSheet(stylesheet)

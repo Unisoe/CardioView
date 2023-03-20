@@ -6,10 +6,8 @@ import matplotlib.pyplot as plt
 import imageio.v2 as imageio
 from patient_data_sqlite import get_gif_path
 
-
 def run_processing(patient_data, thresh, pat_num):
     # Initiate variables and static values
-    patient_data = patient_data.decode()
     ecg = loadmat(patient_data) #need to take the
     array_data = np.array(ecg['array_data'])
     array_gain = np.zeros(112)
@@ -19,7 +17,6 @@ def run_processing(patient_data, thresh, pat_num):
     end_range = 112
     x_coord = np.zeros(112)
     y_coord = np.zeros(112)
-
 
     # Put data into variables
     for n in range(start_range, end_range):
@@ -90,4 +87,4 @@ def run_processing(patient_data, thresh, pat_num):
     return flattened_data
 
 # call function to run
-# run_processing("C:/Users/krist/PycharmProjects/capscone_sigprocessing_v1/vt1_sample.mat", 1, 123456789)
+run_processing("C:/Users/krist/PycharmProjects/capscone_sigprocessing_v1/vt1_sample.mat", 1, 123456789)
