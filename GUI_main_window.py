@@ -1,5 +1,4 @@
 import os
-
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QDesktopWidget
@@ -12,15 +11,15 @@ import struct
 
 class UiMainWindow(object):
     def __init__(self):
-        # Set the size of the window
-        self.setGeometry(0, 0, 2000, 1200)
+        # # Set the size of the window
+        # self.setGeometry(0, 0, 2000, 1200)
 
         # Get the screen geometry
         screen_geometry = QDesktopWidget().availableGeometry()
 
         # Calculate the position of the window
-        x = np.round((screen_geometry.width() - self.width()) / 2)
-        y = np.round((screen_geometry.height() - self.height()) / 2)
+        x = int(np.round((screen_geometry.width() - self.width()) / 2))
+        y = int(np.round((screen_geometry.height() - self.height()) / 2))
 
         # Move the window to the calculated position
         self.move(x, y)
