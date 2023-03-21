@@ -1,6 +1,7 @@
 import sqlite3
 import base64
 import os
+from PyQt5.QtWidgets import QMessageBox
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -96,7 +97,6 @@ def get_user(username, user_password):
 
     if count == 0:
         # Close cursor and connection
-        print('cannot find username')
         cursor.close()
         conn.close()
         return 0
@@ -120,5 +120,4 @@ def get_user(username, user_password):
         # Close cursor and connection
         cursor.close()
         conn.close()
-        print('cannot find password')
         return 0

@@ -77,13 +77,13 @@ def run_processing(patient_data, thresh, pat_num):
         images.append(imageio.imread('frame_{0:03d}.png'.format(i)))
         os.remove(f'frame_{i:03d}.png')
 
-    # Get gif path and make it only accessible by user
+    # Get gif path
     gif_path = get_gif_path(pat_num)
 
     imageio.mimsave(gif_path, #need to send it to application save location
-                    images, fps=10) # edithere update so that .gif is deleted upon closure of application
+                    images, fps=10)
 
     return flattened_data
 
 # call function to run
-run_processing("C:/Users/krist/PycharmProjects/capscone_sigprocessing_v1/vt1_sample.mat", 1, 123456789)
+# run_processing("C:/Users/krist/PycharmProjects/capscone_sigprocessing_v1/vt1_sample.mat", 1, 123456789)

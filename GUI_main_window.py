@@ -1,5 +1,8 @@
+import os
+
+import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QDesktopWidget
 from patient_data_sqlite import new_entry, get_m_file
 from popup import NewUserDialog
 import RunProcessing
@@ -7,8 +10,21 @@ import serial
 import struct
 
 
-class Ui_MainWindow(object):
+class UiMainWindow(object):
     def __init__(self):
+        # Set the size of the window
+        self.setGeometry(0, 0, 2000, 1200)
+
+        # Get the screen geometry
+        screen_geometry = QDesktopWidget().availableGeometry()
+
+        # Calculate the position of the window
+        x = np.round((screen_geometry.width() - self.width()) / 2)
+        y = np.round((screen_geometry.height() - self.height()) / 2)
+
+        # Move the window to the calculated position
+        self.move(x, y)
+
         self.send_to_mc = None
         self.new_user = None
         self.timer = None
@@ -52,14 +68,22 @@ class Ui_MainWindow(object):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(889, 474)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
+
         self.ser_pat_name = QtWidgets.QLineEdit(self.centralwidget)
         self.ser_pat_name.setObjectName("ser_pat_name")
         self.gridLayout.addWidget(self.ser_pat_name, 10, 5, 1, 4)
+
+        self.ser_pat_num = QtWidgets.QLineEdit(self.centralwidget)
+        self.ser_pat_num.setObjectName("ser_pat_num")
+        self.gridLayout.addWidget(self.ser_pat_num, 11, 5, 1, 4)
+
+        self.thresh = QtWidgets.QLineEdit(self.centralwidget)
+        self.thresh.setObjectName("thresh")
+        self.gridLayout.addWidget(self.thresh, 12, 5, 1, 1)
 
         self.get_pat_data_title = QtWidgets.QLineEdit(self.centralwidget)
         font = QtGui.QFont()
@@ -117,10 +141,6 @@ class Ui_MainWindow(object):
         self.pat_num_txt1.setObjectName("lineEdit_3")
         self.gridLayout.addWidget(self.pat_num_txt1, 11, 3, 1, 1)
 
-        self.thresh = QtWidgets.QLineEdit(self.centralwidget)
-        self.thresh.setObjectName("thresh")
-        self.gridLayout.addWidget(self.thresh, 12, 5, 1, 1)
-
         self.disp_patient = QtWidgets.QPlainTextEdit(self.centralwidget)
         self.disp_patient.setObjectName("disp_patient")
         self.disp_patient.setReadOnly(True)
@@ -144,10 +164,6 @@ class Ui_MainWindow(object):
         self.connect_mc.setObjectName("connect_mc")
         self.connect_mc.clicked.connect(self.connect_to_model)
         self.gridLayout.addWidget(self.connect_mc, 12, 8, 1, 1)
-
-        self.ser_pat_num = QtWidgets.QLineEdit(self.centralwidget)
-        self.ser_pat_num.setObjectName("ser_pat_num")
-        self.gridLayout.addWidget(self.ser_pat_num, 11, 5, 1, 4)
 
         spacerItem2 = QtWidgets.QSpacerItem(20, 127, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem2, 10, 4, 3, 1)
@@ -336,7 +352,8 @@ class Ui_MainWindow(object):
         # Display gif
         movie = QtGui.QMovie(gif_file)
         self.disp_graph.setMovie(movie)
-        movie.start()  # edit here
+        movie.start
+        os.remove(gif_file) #edithere - may need to remove gif file later, not sure if it is stored in memory
 
         # Display patient info edithere
         text = f"Patient Name = {pat_name}\nPatient Number = {pat_num}\nData Entry Date = {date}"

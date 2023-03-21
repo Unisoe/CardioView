@@ -59,12 +59,9 @@ def new_entry(m_file_path, name, number, date):
     os.makedirs(database_path, exist_ok=True)
 
     if count == 1:
-        from GUI_main_window import Ui_MainWindow
-        ret = QMessageBox.question(Ui_MainWindow, 'Error', "Patient already exists in the database",
-                                   QMessageBox.Yes | QMessageBox.No)
-        if ret == QMessageBox.No:
-            cursor.close()
-            conn.close()
+        popup_val = check_overwrite(cursor, conn)
+        if popup_val == 0:
+            return
 
     # make paths for files (now that we know they don't already exist)
     new_m_file_path = os.path.join(database_path, f'{number}.m')
@@ -105,9 +102,8 @@ def get_m_file(ser_name, num):
                     ''', (num,))
     count = cursor.fetchone()[0]
 
-    if count == 0: # edithere
-        popup_nopat_window = NoPat()
-        popup_nopat_window.show()
+    if count == 0:
+        error_popup("This patient does not exist.")
         cursor.close()
         conn.close()
         return 0
@@ -125,9 +121,8 @@ def get_m_file(ser_name, num):
     gif_path = f_patient.decrypt(gif_path_e)
     date = f_patient.decrypt(date_e)
 
-    if bytes(ser_name, 'utf-8') != name: # edithere
-        popup_nopat_window = NoPat()
-        popup_nopat_window.show()
+    if bytes(ser_name, 'utf-8') != name:
+        error_popup("This patient does not exist.")
         cursor.close()
         conn.close()
         return 0
@@ -153,10 +148,33 @@ def get_gif_path(num):
 
     # Fetch tuple (there should only be one)
     gif_path_e = cursor.fetchone()[0]
-    gif_path = f_patient.decrypt(gif_path_e)
+    gif_path = bytes.decode(f_patient.decrypt(gif_path_e), 'utf-8')
 
     # Close cursor and connection
     cursor.close()
     conn.close()
 
     return gif_path
+
+def error_popup(text):
+    msg_box = QMessageBox()
+    msg_box.setWindowTitle("Error")
+    msg_box.setText(text)
+    msg_box.exec_()
+
+def check_overwrite(cursor, conn):
+    msg_box = QMessageBox()
+    msg_box.setIcon(QMessageBox.Question)
+    msg_box.setWindowTitle("Existing Patient")
+    msg_box.setText("Data for this patient number already exists in the database. \n\nWould you like to overwrite it?")
+    msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+    msg_box.setDefaultButton(QMessageBox.Cancel)
+    response = msg_box.exec_()
+    if response == QMessageBox.Yes:
+        # Code to execute if the user clicked "Ok"
+        return 1
+    else:
+        # Code to execute if the user clicked "Cancel"
+        cursor.close()
+        conn.close()
+        return 0
