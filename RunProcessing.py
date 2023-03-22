@@ -4,7 +4,7 @@ from processing import processing
 from mat4py import loadmat
 import matplotlib.pyplot as plt
 import imageio.v2 as imageio
-from Databases.patient_data_sqlite import get_gif_path
+from patient_data_sqlite import get_gif_path
 
 def run_processing(patient_data, thresh, pat_num):
     # Initiate variables and static values
