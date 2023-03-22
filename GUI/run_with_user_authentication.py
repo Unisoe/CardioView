@@ -1,9 +1,7 @@
-from PyQt5.QtWidgets import QApplication, QDialog, QLineEdit, QPushButton, QVBoxLayout, QLabel, QMessageBox, \
-    QDesktopWidget
+from PyQt5.QtWidgets import QApplication, QDialog, QLineEdit, QPushButton, QVBoxLayout, QLabel, QMessageBox
 from RunUI_main_window import MainWindow
-from user_sqlite import get_user
+from Databases.user_sqlite import get_user
 import sys
-import numpy as np
 import qdarktheme
 
 class LoginDialog(QDialog):

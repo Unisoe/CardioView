@@ -2,7 +2,7 @@ import os
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QDesktopWidget
-from patient_data_sqlite import new_entry, get_m_file
+from Databases.patient_data_sqlite import new_entry, get_m_file
 from popup import NewUserDialog
 import RunProcessing
 import serial

@@ -1,12 +1,3 @@
-import sys
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtWidgets import QPushButton
-from PyQt5.QtWidgets import QMessageBox
-
-from patient_data_sqlite import get_gif_path
-from user_sqlite import new_user
-
 # from PyQt5.QtCore import QSize
 #
 # class MainWindow(QMainWindow):

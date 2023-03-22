@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QDialog, QLineEdit, QPushButton, QVBoxLayout, QLabel, QMessageBox
-from user_sqlite import new_user
+from Databases.user_sqlite import new_user
 
 class NewUserDialog(QDialog):
     def __init__(self):
