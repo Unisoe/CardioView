@@ -7,19 +7,6 @@ import qdarktheme
 class LoginDialog(QDialog):
     def __init__(self):
         super().__init__()
-        # # Set the size of the window
-        # self.setGeometry(0, 0, 400, 300)
-        #
-        # # Get the screen geometry
-        # screen_geometry = QDesktopWidget().availableGeometry()
-        #
-        # # Calculate the position of the window
-        # x = np.round((screen_geometry.width() - self.width()) / 2)
-        # y = np.round((screen_geometry.height() - self.height()) / 2)
-        #
-        # # Move the window to the calculated position
-        # self.move(x, y)
-
         self.setWindowTitle("Login")
         self.username = QLineEdit(self)
         self.password = QLineEdit(self)
@@ -63,4 +50,5 @@ if __name__ == "__main__":
         sys.exit(app.exec_()) #edithere
     else:
         sys.exit(app.exec_())
+
     sys.exit(app.exec_())

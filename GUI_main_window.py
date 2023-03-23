@@ -11,19 +11,7 @@ import struct
 
 class UiMainWindow(object):
     def __init__(self):
-        # # Set the size of the window
-        # self.setGeometry(0, 0, 2000, 1200)
-
-        # Get the screen geometry
-        screen_geometry = QDesktopWidget().availableGeometry()
-
-        # Calculate the position of the window
-        x = int(np.round((screen_geometry.width() - self.width()) / 2))
-        y = int(np.round((screen_geometry.height() - self.height()) / 2))
-
-        # Move the window to the calculated position
-        self.move(x, y)
-
+        self.movie = None
         self.send_to_mc = None
         self.new_user = None
         self.timer = None
@@ -64,6 +52,7 @@ class UiMainWindow(object):
         self.upload_database = None
         self.upload_mc = None
         self.view_data = None
+
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -122,8 +111,9 @@ class UiMainWindow(object):
         self.disp_speed = QtWidgets.QSlider(self.centralwidget)
         self.disp_speed.setOrientation(QtCore.Qt.Horizontal)
         self.disp_speed.setObjectName("disp_speed")
-        self.disp_speed.setRange(1, 100)
-        self.disp_speed.setValue(50)
+        self.disp_speed.setRange(1, 10)
+        self.disp_speed.setValue(5)
+        self.disp_speed.setEnabled(False)
         self.disp_speed.valueChanged.connect(self.slider_value_changed)
         self.gridLayout.addWidget(self.disp_speed, 10, 1, 1, 1)
 
@@ -348,19 +338,20 @@ class UiMainWindow(object):
         # Run Processing
         self.send_to_mc = RunProcessing.run_processing(m_file, thresh, pat_num)
 
-        # Display gif
-        movie = QtGui.QMovie(gif_file)
-        self.disp_graph.setMovie(movie)
-        movie.start
-        os.remove(gif_file) #edithere - may need to remove gif file later, not sure if it is stored in memory
-
         # Display patient info edithere
         text = f"Patient Name = {pat_name}\nPatient Number = {pat_num}\nData Entry Date = {date}"
         self.disp_patient.setPlainText(text)
 
+        # Display gif
+        movie = QtGui.QMovie(gif_file)
+        self.disp_graph.setMovie(movie)
+        movie.start
+        # self.movie.started.connect(lambda: self.disp_speed.setEnabled(True))
+        # self.movie.finished.connect(lambda: self.disp_speed.setEnabled(False))
+
     def slider_value_changed(self, value): #edithere
         # Set the speed of the GIF based on the value of the slider
-        self.movie.setSpeed(value)
+        self.movie.setSpeed(value*10)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

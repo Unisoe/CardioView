@@ -82,6 +82,7 @@ def new_entry(m_file_path, name, number, date):
 
     # Commit changes to the database
     conn.commit()
+    error_popup("Patient file created.")
 
     # Close cursor and connection
     cursor.close()
@@ -121,7 +122,7 @@ def get_m_file(ser_name, num):
     gif_path = f_patient.decrypt(gif_path_e)
     date = f_patient.decrypt(date_e)
 
-    if bytes(ser_name, 'utf-8') != name:
+    if ser_name != name.decode('utf-8'):
         error_popup("This patient does not exist.")
         cursor.close()
         conn.close()
@@ -131,7 +132,7 @@ def get_m_file(ser_name, num):
     cursor.close()
     conn.close()
 
-    return m_file_path, gif_path, name, num, date
+    return m_file_path.decode('utf-8'), gif_path.decode('utf-8'), name.decode('utf-8'), num, date.decode('utf-8')
 
 def get_gif_path(num):
     # Connect to database
@@ -158,7 +159,7 @@ def get_gif_path(num):
 
 def error_popup(text):
     msg_box = QMessageBox()
-    msg_box.setWindowTitle("Error")
+    msg_box.setWindowTitle("Attention") #maybe replace with our brand name edithere
     msg_box.setText(text)
     msg_box.exec_()
 
