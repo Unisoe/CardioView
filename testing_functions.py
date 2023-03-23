@@ -25,8 +25,27 @@
 #     mainWin.show()
 #     sys.exit( app.exec_() )
 
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel
+from PyQt5.QtGui import QMovie, QPixmap
+from PyQt5.QtCore import Qt
+import sys
 
-# met = get_gif_path(9975)
-# new_user('admin', 'abc', 'abcd')
-a=123
+from patient_data_sqlite import get_gif_path, get_m_file
+
+app = QApplication(sys.argv)
+window = QWidget()
+
+m_file, gif_file, pat_name, pat_num, date = get_m_file('a',1)
+
+gif_label = QLabel(window)
+gif = QMovie(gif_file)
+gif_label.setMovie(gif)
+gif_size = QPixmap(gif_file).size()
+gif_label.resize(gif_size)
+gif.start()
+
+window.setWindowTitle("Display GIF")
+window.show()
+
+sys.exit(app.exec_())
 

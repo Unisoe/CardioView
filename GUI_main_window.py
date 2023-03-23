@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox, QDesktopWidget
 from patient_data_sqlite import new_entry, get_m_file
 from popup import NewUserDialog
@@ -60,6 +61,11 @@ class UiMainWindow(object):
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
+
+        stylesheet = "QWidget { font-size: 15px; }"
+        self.centralwidget.setStyleSheet(stylesheet)
+
+
 
         self.ser_pat_name = QtWidgets.QLineEdit(self.centralwidget)
         self.ser_pat_name.setObjectName("ser_pat_name")
@@ -145,9 +151,9 @@ class UiMainWindow(object):
         self.pat_name1.setObjectName("lineEdit_2")
         self.gridLayout.addWidget(self.pat_name1, 10, 3, 1, 1)
 
-        self.upload_mc = QtWidgets.QPushButton(self.centralwidget) #edithere maybe remove this button, have connection/send same button
-        self.upload_mc.setObjectName("upload_mc")
-        self.gridLayout.addWidget(self.upload_mc, 13, 8, 1, 1)
+        # self.upload_mc = QtWidgets.QPushButton(self.centralwidget) #edithere maybe remove this button, have connection/send same button
+        # self.upload_mc.setObjectName("upload_mc")
+        # self.gridLayout.addWidget(self.upload_mc, 13, 8, 1, 1)
 
         self.connect_mc = QtWidgets.QPushButton(self.centralwidget) #edithere this might be the only button for connection
         self.connect_mc.setObjectName("connect_mc")
@@ -161,7 +167,7 @@ class UiMainWindow(object):
         self.upload_database = QtWidgets.QPushButton(self.centralwidget)
         self.upload_database.setObjectName("upload_database")
         self.upload_database.clicked.connect(self.new_pat_info)
-        self.gridLayout.addWidget(self.upload_database, 7, 8, 1, 1)
+        self.gridLayout.addWidget(self.upload_database, 6, 8, 1, 1) #edithere
 
         spacerItem3 = QtWidgets.QSpacerItem(808, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem3, 0, 0, 1, 10)
@@ -263,7 +269,7 @@ class UiMainWindow(object):
 
         self.date = QtWidgets.QDateEdit(self.centralwidget)
         self.date.setObjectName("date")
-        self.gridLayout.addWidget(self.date, 6, 5, 1, 4)
+        self.gridLayout.addWidget(self.date, 6, 5, 1, 3) #edithere
 
         # File Search Button
         self.file_search = QtWidgets.QPushButton(self.centralwidget)
@@ -271,15 +277,15 @@ class UiMainWindow(object):
         self.file_search.clicked.connect(self.openFileNameDialog)
         self.gridLayout.addWidget(self.file_search, 3, 8, 1, 1)
 
-        self.prog_database = QtWidgets.QProgressBar(self.centralwidget)
-        self.prog_database.setProperty("value", 24)
-        self.prog_database.setObjectName("prog_database")
-        self.gridLayout.addWidget(self.prog_database, 7, 3, 1, 5)
-
-        self.prog_mc = QtWidgets.QProgressBar(self.centralwidget)
-        self.prog_mc.setProperty("value", 24)
-        self.prog_mc.setObjectName("prog_mc")
-        self.gridLayout.addWidget(self.prog_mc, 13, 3, 1, 5)
+        # self.prog_database = QtWidgets.QProgressBar(self.centralwidget)
+        # self.prog_database.setProperty("value", 24)
+        # self.prog_database.setObjectName("prog_database")
+        # self.gridLayout.addWidget(self.prog_database, 7, 3, 1, 5)
+        #
+        # self.prog_mc = QtWidgets.QProgressBar(self.centralwidget)
+        # self.prog_mc.setProperty("value", 24)
+        # self.prog_mc.setObjectName("prog_mc")
+        # self.gridLayout.addWidget(self.prog_mc, 13, 3, 1, 5)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -343,15 +349,17 @@ class UiMainWindow(object):
         self.disp_patient.setPlainText(text)
 
         # Display gif
-        movie = QtGui.QMovie(gif_file)
-        self.disp_graph.setMovie(movie)
-        movie.start
+        gif = QtGui.QMovie(gif_file)
+        self.disp_graph.setMovie(gif)
+        gif_size = QPixmap(gif_file).size()
+        self.disp_graph.resize(gif_size)
+        gif.start()
         # self.movie.started.connect(lambda: self.disp_speed.setEnabled(True))
         # self.movie.finished.connect(lambda: self.disp_speed.setEnabled(False))
 
     def slider_value_changed(self, value): #edithere
         # Set the speed of the GIF based on the value of the slider
-        self.movie.setSpeed(value*10)
+        self.gif.setSpeed(value*10)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -362,7 +370,7 @@ class UiMainWindow(object):
         self.view_data.setText(_translate("MainWindow", "View Data"))
         self.pat_num_txt1.setText(_translate("MainWindow", "Patient Number:"))
         self.pat_name1.setText(_translate("MainWindow", "Patient Name:"))
-        self.upload_mc.setText(_translate("MainWindow", "Upload to Model"))
+        # self.upload_mc.setText(_translate("MainWindow", "Upload to Model"))
         self.connect_mc.setText(_translate("MainWindow", "Connect to Model"))
         self.upload_database.setText(_translate("MainWindow", "Upload to Database"))
         self.new_pat_data_title.setText(_translate("MainWindow", "NEW PATIENT DATA"))
