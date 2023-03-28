@@ -10,6 +10,7 @@ import struct
 class UiMainWindow(object):
     def __init__(self):
         super().__init__()
+        self.popup_user_window = None
         self.movie = None
         self.send_to_mc = None
         self.new_user = None
@@ -113,15 +114,6 @@ class UiMainWindow(object):
         self.line_get.setObjectName("line_get")
         self.rightLayout.addWidget(self.line_get, 6, 2, 1, 4)
 
-        self.disp_speed = QtWidgets.QSlider(self.centralwidget)
-        self.disp_speed.setOrientation(QtCore.Qt.Horizontal)
-        self.disp_speed.setObjectName("Disp Speed Slider")
-        self.disp_speed.setRange(0, 10)
-        self.disp_speed.setValue(5)
-        self.disp_speed.setEnabled(False)
-        self.disp_speed.valueChanged.connect(self.slider_value_changed)
-        self.leftLayout.addWidget(self.disp_speed, 7, 1, 1, 1)
-
         self.pat_num_txt1 = QtWidgets.QLabel(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -131,10 +123,6 @@ class UiMainWindow(object):
         self.pat_num_txt1.setObjectName("New Pat Num Label")
         self.rightLayout.addWidget(self.pat_num_txt1, 4, 2, 1, 1)
 
-        self.disp_patient = QtWidgets.QLabel(self.centralwidget)
-        self.disp_patient.setObjectName("disp_patient")
-        self.leftLayout.addWidget(self.disp_patient, 8, 1, 3, 1)
-
         self.pat_name_get = QtWidgets.QLabel(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -143,10 +131,6 @@ class UiMainWindow(object):
         self.pat_name_get.setSizePolicy(sizePolicy)
         self.pat_name_get.setObjectName("Get Patient Label")
         self.rightLayout.addWidget(self.pat_name_get, 8, 2, 1, 1)
-
-        # self.upload_mc = QtWidgets.QPushButton(self.centralwidget) #edithere maybe remove this button, have connection/send same button
-        # self.upload_mc.setObjectName("upload_mc")
-        # self.outerLayout.addWidget(self.upload_mc, 13, 8, 1, 1)
 
         # upload to database button
         self.upload_database = QtWidgets.QPushButton(self.centralwidget)
@@ -175,19 +159,6 @@ class UiMainWindow(object):
         self.load_data = QtWidgets.QLineEdit(self.centralwidget)
         self.load_data.setObjectName("load_data")
         self.rightLayout.addWidget(self.load_data, 2, 3, 1, 2)
-
-        # New user button
-        self.new_user = QtWidgets.QPushButton(self.centralwidget) # edithere
-        self.new_user.setObjectName("new_user")
-        self.new_user.clicked.connect(self.new_user_window)
-        self.leftLayout.addWidget(self.new_user, 1, 1, 1, 1)
-
-        # Create a figure and axis
-        self.disp_graph = QtWidgets.QLabel(self.centralwidget)
-        self.disp_graph.setMinimumSize(QtCore.QSize(200, 200))
-        self.disp_graph.setBaseSize(QtCore.QSize(200, 200))
-        self.disp_graph.setObjectName("disp_graph")
-        self.leftLayout.addWidget(self.disp_graph, 2, 1, 5, 1)
 
         self.new_pat_name_label = QtWidgets.QLabel(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
@@ -236,15 +207,33 @@ class UiMainWindow(object):
         self.file_search.clicked.connect(self.openFileNameDialog)
         self.rightLayout.addWidget(self.file_search, 2, 5, 1, 1)
 
-        # self.prog_database = QtWidgets.QProgressBar(self.centralwidget)
-        # self.prog_database.setProperty("value", 24)
-        # self.prog_database.setObjectName("prog_database")
-        # self.outerLayout.addWidget(self.prog_database, 7, 3, 1, 5)
-        #
-        # self.prog_mc = QtWidgets.QProgressBar(self.centralwidget)
-        # self.prog_mc.setProperty("value", 24)
-        # self.prog_mc.setObjectName("prog_mc")
-        # self.outerLayout.addWidget(self.prog_mc, 13, 3, 1, 5)
+        # Speed toggle slider
+        self.disp_speed = QtWidgets.QSlider(self.centralwidget)
+        self.disp_speed.setOrientation(QtCore.Qt.Horizontal)
+        self.disp_speed.setObjectName("Disp Speed Slider")
+        self.disp_speed.setRange(0, 10)
+        self.disp_speed.setValue(5)
+        self.disp_speed.setEnabled(False)
+        self.disp_speed.valueChanged.connect(self.slider_value_changed)
+        self.leftLayout.addWidget(self.disp_speed, 7, 1, 1, 1)
+
+        # Patient info display
+        self.disp_patient = QtWidgets.QLabel(self.centralwidget)
+        self.disp_patient.setObjectName("disp_patient")
+        self.leftLayout.addWidget(self.disp_patient, 8, 1, 3, 1)
+
+        # New user button
+        self.new_user = QtWidgets.QPushButton(self.centralwidget)  # edithere
+        self.new_user.setObjectName("new_user")
+        self.new_user.clicked.connect(self.new_user_window)
+        self.leftLayout.addWidget(self.new_user, 1, 1, 1, 1)
+
+        # Create a figure and axis
+        self.disp_graph = QtWidgets.QLabel(self.centralwidget)
+        self.disp_graph.setMinimumSize(QtCore.QSize(200, 200))
+        self.disp_graph.setBaseSize(QtCore.QSize(200, 200))
+        self.disp_graph.setObjectName("disp_graph")
+        self.leftLayout.addWidget(self.disp_graph, 2, 1, 5, 1)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -305,20 +294,20 @@ class UiMainWindow(object):
         m_file, gif_file, pat_name, pat_num, date = get_m_file(ser_pat_name, ser_pat_num)
 
         # Run Processing
-        self.send_to_mc = RunProcessing.run_processing(m_file, thresh, pat_num)
+        # self.send_to_mc = RunProcessing.run_processing(m_file, thresh, pat_num)
 
         # Display patient info edithere
         text = f"Patient Name = {pat_name}\nPatient Number = {pat_num}\nData Entry Date = {date}"
-        self.disp_patient.setPlainText(text)
+        self.disp_patient.setText(text)
 
         # Display gif
         gif = QtGui.QMovie(gif_file)
         self.disp_graph.setMovie(gif)
         gif_size = QPixmap(gif_file).size()
-        self.disp_graph.resize(gif_size)
+        self.disp_graph.resize(gif_size) #resize the gif
         gif.start()
-        # self.movie.started.connect(lambda: self.disp_speed.setEnabled(True))
-        # self.movie.finished.connect(lambda: self.disp_speed.setEnabled(False))
+        self.movie.started.connect(lambda: self.disp_speed.setEnabled(True))
+        self.movie.finished.connect(lambda: self.disp_speed.setEnabled(False))
 
     def slider_value_changed(self, value): #edithere
         # Set the speed of the GIF based on the value of the slider

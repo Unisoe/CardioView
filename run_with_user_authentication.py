@@ -3,6 +3,7 @@ from RunUI_main_window import MainWindow
 from user_sqlite import get_user
 import sys
 import qdarktheme
+from start_close import on_close, on_startup
 
 class LoginDialog(QDialog):
     def __init__(self):
@@ -41,13 +42,26 @@ class LoginDialog(QDialog):
 if __name__ == "__main__":
     qdarktheme.enable_hi_dpi()
     app = QApplication(sys.argv)
+    # print(f'Application path {config.application_path}')
+    '''
+        TODO:
+        1. Move creating databases for patient database and user database here (pre-startup)
+        2. Add a user with admin/admin username/pass if it doesn't exist here (pre-startup)
+        3. Remove base path
+        4. Replace database_path to use config.application_path as the root folder
+           (i.e. database_path = path.join(config.application_path, patient_data.db).
+           Should probably also make it patient_database_path.
+        5. Do similar for user database (make a user_database_path variable).
+    '''
     qdarktheme.setup_theme("auto")
+    on_startup()
     login_dialog = LoginDialog()
     if login_dialog.exec_() == QDialog.Accepted:
         main_window = MainWindow()
         main_window.show()
         app.exec()
-        sys.exit(app.exec_()) #edithere
+        on_close() # remove gif files on close
+        sys.exit(app.exec_())
     else:
         sys.exit(app.exec_())
     sys.exit(app.exec_())

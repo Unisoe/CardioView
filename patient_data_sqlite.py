@@ -3,6 +3,7 @@ import shutil
 import os
 from PyQt5.QtWidgets import QMessageBox
 import base64
+import config
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -29,23 +30,8 @@ def new_entry(m_file_path, name, number, date):
     # Create a cursor to execute SQL commands
     cursor = conn.cursor()
 
-    # Get file name from file path
-    dir_name, file_name = os.path.split(m_file_path)
-    # app_paths = AppDataPaths() # edithere this will be used when the application is saved in process file
-    # base_path = app_paths.app_data_path.replace('\\', '/')
-    base_path = r'C:\Users\krist\OneDrive\Documents\School\8SEM-W2023\BME700 (Capstone)'
-    database_path = os.path.join(base_path, f'patient_database')
-
-    # Create table 'entries'
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS patients (
-            m_file_path TEXT,
-            gif_path TEXT,
-            name TEXT,
-            number INTEGER PRIMARY KEY,
-            date TEXT
-        )
-    ''')
+    # Create database path for .m and .gif files
+    patient_database_path = os.path.join(config.application_path, f'patient_data')
 
     # If entry already exists return error
     cursor.execute('''
@@ -54,9 +40,9 @@ def new_entry(m_file_path, name, number, date):
                 ''', (number,))
     count = cursor.fetchone()[0]
 
-    if not os.path.exists(database_path):
-        os.mkdir(database_path)
-    os.makedirs(database_path, exist_ok=True)
+    if not os.path.exists(patient_database_path):
+        os.mkdir(patient_database_path)
+    os.makedirs(patient_database_path, exist_ok=True)
 
     if count == 1:
         popup_val = check_overwrite(cursor, conn)
@@ -64,8 +50,8 @@ def new_entry(m_file_path, name, number, date):
             return
 
     # make paths for files (now that we know they don't already exist)
-    new_m_file_path = os.path.join(database_path, f'{number}.m')
-    gif_path = os.path.join(database_path, f'{number}.gif')
+    new_m_file_path = os.path.join(patient_database_path, f'{number}.m')
+    gif_path = os.path.join(patient_database_path, f'{number}.gif')
 
     # Move .m file to app location
     shutil.copyfile(m_file_path, new_m_file_path)
@@ -161,6 +147,8 @@ def error_popup(text):
     msg_box = QMessageBox()
     msg_box.setWindowTitle("Attention") #maybe replace with our brand name edithere
     msg_box.setText(text)
+    stylesheet = "QWidget { font-size: 15px; }"
+    msg_box.setStyleSheet(stylesheet)
     msg_box.exec_()
 
 def check_overwrite(cursor, conn):

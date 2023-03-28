@@ -7,6 +7,9 @@ import imageio.v2 as imageio
 from patient_data_sqlite import get_gif_path
 
 def run_processing(patient_data, thresh, pat_num):
+    # QMessageBox.about(MainWindow, "Processing Data", "Please wait, data is being processed.") #edit so that "cancel button cancels processing,
+    # Add close statement to the end of processing to close the messagebox
+
     # Initiate variables and static values
     ecg = loadmat(patient_data) #need to take the
     array_data = np.array(ecg['array_data'])

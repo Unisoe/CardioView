@@ -1,7 +1,5 @@
 import sqlite3
 import base64
-import os
-from PyQt5.QtWidgets import QMessageBox
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -31,14 +29,6 @@ def new_user(username, password, re_password):
     # Create a cursor to execute SQL commands
     cursor = conn.cursor()
 
-    # Create table 'entries'
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            username BLOB PRIMARY KEY COLLATE BINARY,
-            password BLOB COLLATE BINARY
-        )
-    ''')
-
     # Check if the specified username exists in the database
     cursor.execute('''
         SELECT COUNT(*) FROM users
@@ -67,6 +57,17 @@ def new_user(username, password, re_password):
         INSERT INTO users (username, password)
         VALUES (?,?)
     ''', (byte_username, f_user.encrypt(byte_password)))
+
+    cursor.execute('''
+            SELECT COUNT(*) FROM users
+                ''',)
+    count_total = cursor.fetchone()[0]
+
+    if count_total == 2:
+        cursor.execute('''
+            DELETE FROM users
+            WHERE username = ?
+        ''', (b'admin',))
 
     # Commit changes to the database
     conn.commit()
