@@ -23,7 +23,7 @@ class UiMainWindow(object):
         self.centralwidget = None
         self.connect_mc = None
         self.date = None
-        self.disp_graph = None
+        self.disp_graph_gif = None
         self.disp_patient = None
         self.disp_speed = None
         self.file_search = None
@@ -215,12 +215,12 @@ class UiMainWindow(object):
         self.disp_speed.setValue(5)
         self.disp_speed.setEnabled(False)
         self.disp_speed.valueChanged.connect(self.slider_value_changed)
-        self.leftLayout.addWidget(self.disp_speed, 7, 1, 1, 1)
+        self.leftLayout.addWidget(self.disp_speed, 3, 1, 1, 1)
 
         # Patient info display
         self.disp_patient = QtWidgets.QLabel(self.centralwidget)
         self.disp_patient.setObjectName("disp_patient")
-        self.leftLayout.addWidget(self.disp_patient, 8, 1, 3, 1)
+        self.leftLayout.addWidget(self.disp_patient, 7, 1, 1, 1)
 
         # New user button
         self.new_user = QtWidgets.QPushButton(self.centralwidget)  # edithere
@@ -228,12 +228,33 @@ class UiMainWindow(object):
         self.new_user.clicked.connect(self.new_user_window)
         self.leftLayout.addWidget(self.new_user, 1, 1, 1, 1)
 
+        # Create a figure and axis for the gif
+        self.disp_graph_gif = QtWidgets.QLabel(self.centralwidget)
+        self.disp_graph_gif.setMinimumSize(QtCore.QSize(200, 200))
+        self.disp_graph_gif.setBaseSize(QtCore.QSize(200, 200))
+        self.disp_graph_gif.setObjectName("disp_graph_gif")
+        self.leftLayout.addWidget(self.disp_graph_gif, 2, 1, 1, 1)
+
+        # Create a figure and axis for
+        self.disp_graph_1 = QtWidgets.QLabel(self.centralwidget)
+        self.disp_graph_1.setMinimumSize(QtCore.QSize(200, 200))
+        self.disp_graph_1.setBaseSize(QtCore.QSize(200, 200))
+        self.disp_graph_1.setObjectName("disp_graph_1")
+        self.leftLayout.addWidget(self.disp_graph_1, 4, 1, 1, 1)
+
         # Create a figure and axis
-        self.disp_graph = QtWidgets.QLabel(self.centralwidget)
-        self.disp_graph.setMinimumSize(QtCore.QSize(200, 200))
-        self.disp_graph.setBaseSize(QtCore.QSize(200, 200))
-        self.disp_graph.setObjectName("disp_graph")
-        self.leftLayout.addWidget(self.disp_graph, 2, 1, 5, 1)
+        self.disp_graph_2 = QtWidgets.QLabel(self.centralwidget)
+        self.disp_graph_2.setMinimumSize(QtCore.QSize(200, 200))
+        self.disp_graph_2.setBaseSize(QtCore.QSize(200, 200))
+        self.disp_graph_2.setObjectName("disp_graph_2")
+        self.leftLayout.addWidget(self.disp_graph_2, 5, 1, 1, 1)
+
+        # Create a figure and axis
+        self.disp_graph_3 = QtWidgets.QLabel(self.centralwidget)
+        self.disp_graph_3.setMinimumSize(QtCore.QSize(200, 200))
+        self.disp_graph_3.setBaseSize(QtCore.QSize(200, 200))
+        self.disp_graph_3.setObjectName("disp_graph_3")
+        self.leftLayout.addWidget(self.disp_graph_3, 6, 1, 1, 1)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -305,9 +326,9 @@ class UiMainWindow(object):
 
         # Display gif
         gif = QtGui.QMovie(gif_file)
-        self.disp_graph.setMovie(gif)
+        self.disp_graph_gif.setMovie(gif)
         gif_size = QPixmap(gif_file).size()
-        self.disp_graph.resize(gif_size) #resize the gif
+        self.disp_graph_gif.resize(gif_size) #resize the gif
         gif.start()
         self.movie.started.connect(lambda: self.disp_speed.setEnabled(True))
         self.movie.finished.connect(lambda: self.disp_speed.setEnabled(False))

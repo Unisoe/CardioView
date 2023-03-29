@@ -1,3 +1,4 @@
+import imageio
 import numpy as np
 import scipy as sc
 import matplotlib.pyplot as plt
@@ -10,7 +11,7 @@ sns.set()
 sns.set_theme(style="whitegrid", palette="pastel")
 
 
-def processing(ecg, fs, user_thresh, n):
+def processing(ecg, fs, user_thresh, n, pat_num):
     let_c = []
     let_i = []
     sig_lvl = 0
@@ -31,7 +32,7 @@ def processing(ecg, fs, user_thresh, n):
     sigl_buf1 = []
     noisl_buf1 = []
     thresh_buf1 = []
-    pl = 0
+    pl = 1
 
     '''user input thresh'''
     if user_thresh:
@@ -51,12 +52,12 @@ def processing(ecg, fs, user_thresh, n):
     ecg_butt = sc.signal.filtfilt(b, a, ecg)
     ecg_butt = ecg_butt / max(np.absolute(ecg_butt))
 
-    if pl == 1:
-        plt.figure()
-        plt.subplot(511)
-        plt.plot(ecg_butt)
-        plt.title('5-15 Hz Bandpass filter')
-        plt.xlabel('Time (s)')
+    # if pl == 1:
+    #     plt.figure()
+    #     plt.subplot(511)
+    #     plt.plot(ecg_butt)
+    #     plt.title('5-15 Hz Bandpass filter')
+    #     plt.xlabel('Time (s)')
 
     '''derivative filter'''
     h_d = np.array([-1, -2, 0, 2, 1]) * (fs / 8)
@@ -64,20 +65,20 @@ def processing(ecg, fs, user_thresh, n):
     ecg_der = ecg_der / max(ecg_der)
     delay = delay + 2
 
-    if pl == 1:
-        plt.subplot(512)
-        plt.plot(ecg_der)
-        plt.title('derivative filt')
-        plt.xlabel('Time (s)')
+    # if pl == 1:
+    #     plt.subplot(512)
+    #     plt.plot(ecg_der)
+    #     plt.title('derivative filt')
+    #     plt.xlabel('Time (s)')
 
     '''squaring non-linearly to enhance dominant peaks'''
     ecg_squared = np.square(ecg_der)
 
-    if pl == 1:
-        plt.subplot(513)
-        plt.plot(ecg_squared)
-        plt.title('squared')
-        plt.xlabel('Time (s)')
+    # if pl == 1:
+    #     plt.subplot(513)
+    #     plt.plot(ecg_squared)
+    #     plt.title('squared')
+    #     plt.xlabel('Time (s)')
 
     '''moving average'''
     len_ones = round(0.150 * fs)
@@ -86,21 +87,21 @@ def processing(ecg, fs, user_thresh, n):
     ecg_moving_avg = np.convolve(ecg_squared, array_ones)
     delay = delay + 15
 
-    if pl == 1:
-        plt.subplot(514)
-        plt.plot(ecg_moving_avg)
-        plt.title('moving avg')
-        plt.xlabel('Time (s)')
+    # if pl == 1:
+    #     plt.subplot(514)
+    #     plt.plot(ecg_moving_avg)
+    #     plt.title('moving avg')
+    #     plt.xlabel('Time (s)')
 
     '''take the derivative'''
     ecg_moving_avg = np.diff(ecg_moving_avg)
 
-    if pl == 1:
-        plt.subplot(515)
-        plt.plot(ecg_moving_avg)
-        plt.title('moving avg derivative')
-        plt.xlabel('Time (s)')
-        plt.show()
+    # if pl == 1:
+    #     plt.subplot(515)
+    #     plt.plot(ecg_moving_avg)
+    #     plt.title('moving avg derivative')
+    #     plt.xlabel('Time (s)')
+    #     plt.show()
 
     '''fiducial mark'''
     locs, properties = sc.signal.find_peaks(ecg_moving_avg, distance=round(0.2 * fs))
@@ -225,59 +226,34 @@ def processing(ecg, fs, user_thresh, n):
         not_noise = 0
         ser_back = 0
 
-    if pl == 1:
+    if n == 16 or n == 50 or n == 107:
         # plotting
-        fig, axs = plt.subplots(3, 1, constrained_layout=True)
+        plt.figure(figsize=(10,3))
+        plt.ylim(ymax = 1.27, ymin = -1)
         r_label = Line2D.Line2D([0], [0], color='r', label='Noise Level', linestyle='--')
         m_label = Line2D.Line2D([0], [0], color='m', label='Signal Level', linestyle='-.')
         g_label = Line2D.Line2D([0], [0], color='g', label='Adaptive Threshold', linestyle='-.')
         k_vert = mpatches.Circle((0.5, 0.5), radius=0.3, color='k', label='Local Activation', linewidth=0.5)
 
         # plot filtered signal
-        axs[0].plot(ecg_butt)
+        plt.plot(ecg_butt)
         for i in range(len(locs) - 1):
             x_vals = [locs[i], locs[i + 1]]
             y_vals_n = [noisl_buf1[i], noisl_buf1[i + 1]]
             y_vals_s = [sigl_buf1[i], sigl_buf1[i + 1]]
             y_vals_t = [thresh_buf1[i], thresh_buf1[i + 1]]
-            axs[0].plot(x_vals, y_vals_n, linewidth=2, color='r', linestyle='--')
-            axs[0].plot(x_vals, y_vals_s, linewidth=2, color='m', linestyle='-.')
-            axs[0].plot(x_vals, y_vals_t, linewidth=2, color='g', linestyle='-.')
-        axs[0].scatter(let_i.astype(int), let_c, c='k', s=20)
-        pos = axs[0].get_position()
-        axs[0].set_position([pos.x0, pos.y0, pos.width, pos.height * 0.9])
-        axs[0].set_title('Filtered Signal')
-
-        # plot processed signal
-        axs[1].plot(ecg_moving_avg)
-        for i in range(len(locs) - 1):
-            x_vals = [locs[i], locs[i + 1]]
-            y_vals_n = [noisl_buf[i], noisl_buf[i + 1]]
-            y_vals_s = [sigl_buf[i], sigl_buf[i + 1]]
-            y_vals_t = [thresh_buf[i], thresh_buf[i + 1]]
-            axs[1].plot(x_vals, y_vals_n, linewidth=2, color='r', linestyle='--')
-            axs[1].plot(x_vals, y_vals_s, linewidth=2, color='m', linestyle='-.')
-            axs[1].plot(x_vals, y_vals_t, linewidth=2, color='g', linestyle='-.')
-        axs[1].scatter(let_i.astype(int), let_c, c='k', s=20)
-        pos = axs[1].get_position()
-        axs[1].set_position([pos.x0, pos.y0, pos.width, pos.height * 0.9])
-        axs[1].set_title('Processed Signal')
-
-        # plot original signal
-        axs[2].plot(ecg)
-        for i in range(len(let_i)):
-            axs[2].axvline(x=let_i[i], color='k', linestyle='-.')
-        pos = axs[2].get_position()
-        axs[2].set_position([pos.x0, pos.y0, pos.width, pos.height * 0.9])
-        axs[2].set_title('Original Signal')
-
-        # add legend
-        axs[0].legend(handles=[r_label, m_label, g_label, k_vert], bbox_to_anchor=(0., 1.25, 1., 1.25),
-                      loc='lower left', ncol=4, mode="expand", borderaxespad=0.,
+            plt.plot(x_vals, y_vals_n, linewidth=2, color='r', linestyle='--')
+            plt.plot(x_vals, y_vals_s, linewidth=2, color='m', linestyle='-.')
+            plt.plot(x_vals, y_vals_t, linewidth=2, color='g', linestyle='-.')
+        plt.scatter(let_i.astype(int), let_c, c='k', s=20)
+        imageio.mimsave(gif_path, images, fps=10)
+        frame_num = str(pat_num) + '_' + str(n)
+        plt.savefig('frame_{0:03d}.png'.format(frame_num))
+        # # add legend
+        plt.legend(handles=[r_label, m_label, g_label, k_vert],
+                      loc='upper left', ncol=4, mode="expand", borderaxespad=0.,
                       handler_map={mpatches.Circle: HandlerEllipse()})
         plt.show()
-
-        # make plot to be shown on GUI
 
     # create binary array
     send_to_mc = np.zeros(len(ecg))

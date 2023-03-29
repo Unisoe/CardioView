@@ -31,7 +31,7 @@ def new_entry(m_file_path, name, number, date):
     # Create a cursor to execute SQL commands
     cursor = conn.cursor()
 
-    # Create database path for .m and .gif files
+    # Create database path for .m, .gif, and .png files
     patient_file_path = os.path.join(config.application_path, 'patient_files')
 
     # If entry already exists return error
