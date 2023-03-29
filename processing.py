@@ -1,3 +1,5 @@
+import os
+
 import imageio
 import numpy as np
 import scipy as sc
@@ -11,7 +13,7 @@ sns.set()
 sns.set_theme(style="whitegrid", palette="pastel")
 
 
-def processing(ecg, fs, user_thresh, n, pat_num):
+def processing(ecg, fs, user_thresh, n, file_path):
     let_c = []
     let_i = []
     sig_lvl = 0
@@ -246,14 +248,12 @@ def processing(ecg, fs, user_thresh, n, pat_num):
             plt.plot(x_vals, y_vals_s, linewidth=2, color='m', linestyle='-.')
             plt.plot(x_vals, y_vals_t, linewidth=2, color='g', linestyle='-.')
         plt.scatter(let_i.astype(int), let_c, c='k', s=20)
-        imageio.mimsave(gif_path, images, fps=10)
-        frame_num = str(pat_num) + '_' + str(n)
-        plt.savefig('frame_{0:03d}.png'.format(frame_num))
+
         # # add legend
         plt.legend(handles=[r_label, m_label, g_label, k_vert],
                       loc='upper left', ncol=4, mode="expand", borderaxespad=0.,
                       handler_map={mpatches.Circle: HandlerEllipse()})
-        plt.show()
+        plt.savefig(os.path.join(file_path, str(n), '.png'))
 
     # create binary array
     send_to_mc = np.zeros(len(ecg))

@@ -32,7 +32,7 @@ def new_entry(m_file_path, name, number, date):
     cursor = conn.cursor()
 
     # Create database path for .m, .gif, and .png files
-    patient_file_path = os.path.join(config.application_path, 'patient_files')
+    patient_file_path = os.path.join(config.application_path, 'patient_files', number)
 
     # If entry already exists return error
     cursor.execute('''
@@ -51,8 +51,8 @@ def new_entry(m_file_path, name, number, date):
             return
 
     # make paths for files (now that we know they don't already exist)
-    new_m_file_path = os.path.join(patient_file_path, f'{number}.m')
-    gif_path = os.path.join(patient_file_path, f'{number}.gif')
+    new_m_file_path = os.path.join(patient_file_path, '.m')
+    # gif_path = os.path.join(patient_file_path, f'{number}.gif')
 
     # Move .m file to app location
     shutil.copyfile(m_file_path, new_m_file_path)
@@ -64,7 +64,7 @@ def new_entry(m_file_path, name, number, date):
     cursor.execute('''
         INSERT INTO patients (m_file_path, gif_path, name, number, date)
         VALUES (?,?,?,?,?)
-    ''', (f_patient.encrypt(bytes(m_file_path, 'utf-8')), f_patient.encrypt(bytes(gif_path, 'utf-8')),
+    ''', (f_patient.encrypt(bytes(m_file_path, 'utf-8')), f_patient.encrypt(bytes(patient_file_path, 'utf-8')),
           f_patient.encrypt(bytes(name, 'utf-8')), number, f_patient.encrypt(bytes(date, 'utf-8'))))
 
     # Commit changes to the database
@@ -122,7 +122,7 @@ def get_m_file(ser_name, num):
 
     return m_file_path.decode('utf-8'), gif_path.decode('utf-8'), name.decode('utf-8'), num, date.decode('utf-8')
 
-def get_gif_path(num):
+def get_file_path(num):
     # Connect to database (or create it if it doesn't exist)
     patient_database_path = os.path.join(config.application_path, 'patient_database.db')
     conn = sqlite3.connect(patient_database_path)

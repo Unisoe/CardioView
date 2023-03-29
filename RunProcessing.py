@@ -5,13 +5,14 @@ from processing import processing
 from mat4py import loadmat
 import matplotlib.pyplot as plt
 import imageio.v2 as imageio
-from patient_data_sqlite import get_gif_path
+from patient_data_sqlite import get_file_path
 
 def run_processing(patient_data, thresh, pat_num):
     # processing_popup()
 
     # Get gif path
-    gif_path = get_gif_path(pat_num)
+    file_path = get_file_path(pat_num)
+    gif_path = os.path.join(file_path, '.gif')
 
     # Initiate variables and static values
     ecg = loadmat(patient_data) #need to take the
@@ -34,7 +35,7 @@ def run_processing(patient_data, thresh, pat_num):
     # Run processing function
     temp = []
     for n in range(start_range, end_range):
-        send_to_mc = processing(array_data_nogain[:, n], fs, thresh, n, gif_path)
+        send_to_mc = processing(array_data_nogain[:, n], fs, thresh, n, file_path)
         temp.append(send_to_mc)
     #
     # # Remove unwanted empty columns
