@@ -25,13 +25,14 @@ f_patient = Fernet(key2)
 
 def new_entry(m_file_path, name, number, date):
     # Connect to database (or create it if it doesn't exist)
-    conn = sqlite3.connect('patient_data.db')
+    patient_database_path = os.path.join(config.application_path, 'patient_database.db')
+    conn = sqlite3.connect(patient_database_path)
 
     # Create a cursor to execute SQL commands
     cursor = conn.cursor()
 
     # Create database path for .m and .gif files
-    patient_database_path = os.path.join(config.application_path, f'patient_data')
+    patient_file_path = os.path.join(config.application_path, 'patient_files')
 
     # If entry already exists return error
     cursor.execute('''
@@ -40,9 +41,9 @@ def new_entry(m_file_path, name, number, date):
                 ''', (number,))
     count = cursor.fetchone()[0]
 
-    if not os.path.exists(patient_database_path):
-        os.mkdir(patient_database_path)
-    os.makedirs(patient_database_path, exist_ok=True)
+    if not os.path.exists(patient_file_path):
+        os.mkdir(patient_file_path)
+    os.makedirs(patient_file_path, exist_ok=True)
 
     if count == 1:
         popup_val = check_overwrite(cursor, conn)
@@ -50,8 +51,8 @@ def new_entry(m_file_path, name, number, date):
             return
 
     # make paths for files (now that we know they don't already exist)
-    new_m_file_path = os.path.join(patient_database_path, f'{number}.m')
-    gif_path = os.path.join(patient_database_path, f'{number}.gif')
+    new_m_file_path = os.path.join(patient_file_path, f'{number}.m')
+    gif_path = os.path.join(patient_file_path, f'{number}.gif')
 
     # Move .m file to app location
     shutil.copyfile(m_file_path, new_m_file_path)
@@ -76,8 +77,9 @@ def new_entry(m_file_path, name, number, date):
 
 
 def get_m_file(ser_name, num):
-    # Connect to database
-    conn = sqlite3.connect('patient_data.db')
+    # Connect to database (or create it if it doesn't exist)
+    patient_database_path = os.path.join(config.application_path, 'patient_database.db')
+    conn = sqlite3.connect(patient_database_path)
 
     # Create cursor to execute SQL commands
     cursor = conn.cursor()
@@ -93,7 +95,7 @@ def get_m_file(ser_name, num):
         error_popup("This patient does not exist.")
         cursor.close()
         conn.close()
-        return 0
+        return
 
     # Retrieve m_file for specified patient
     cursor.execute('''
@@ -112,7 +114,7 @@ def get_m_file(ser_name, num):
         error_popup("This patient does not exist.")
         cursor.close()
         conn.close()
-        return 0
+        return
 
     # Close cursor and connection
     cursor.close()
@@ -121,10 +123,11 @@ def get_m_file(ser_name, num):
     return m_file_path.decode('utf-8'), gif_path.decode('utf-8'), name.decode('utf-8'), num, date.decode('utf-8')
 
 def get_gif_path(num):
-    # Connect to database
-    conn = sqlite3.connect('patient_data.db')
+    # Connect to database (or create it if it doesn't exist)
+    patient_database_path = os.path.join(config.application_path, 'patient_database.db')
+    conn = sqlite3.connect(patient_database_path)
 
-    # Create cursor to execute SQL commands
+    # Create a cursor to execute SQL commands
     cursor = conn.cursor()
 
     # Retrieve m_file for specified patient

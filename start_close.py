@@ -7,7 +7,8 @@ from user_sqlite import new_user
 def on_startup():
 
     # Connect to user database (or create it if it doesn't exist)
-    conn_user = sqlite3.connect('user_database.db')
+    user_database_path = os.path.join(config.application_path, 'user_database.db')
+    conn_user = sqlite3.connect(user_database_path)
 
     # Create cursor to execute SQL commands
     cursor_user = conn_user.cursor()
@@ -34,7 +35,8 @@ def on_startup():
     conn_user.close()
 
     # Connect to patient database (or create it if it doesn't exist)
-    conn_pat = sqlite3.connect('patient_data.db')
+    patient_database_path = os.path.join(config.application_path, 'patient_database.db')
+    conn_pat = sqlite3.connect(patient_database_path)
 
     # Create a cursor to execute SQL commands
     cursor_pat = conn_pat.cursor()
@@ -56,6 +58,6 @@ def on_startup():
 
 def on_close():
     # Remove the .gif files created
-    patient_database_path = os.path.join(config.application_path, f'patient_data')
-    for gifpath in glob.iglob(os.path.join(patient_database_path, '*.gif')):
+    patient_file_path = os.path.join(config.application_path, 'patient_files')
+    for gifpath in glob.iglob(os.path.join(patient_file_path, '*.gif')):
         os.remove(gifpath)

@@ -1,9 +1,9 @@
-1. delete .gif files after app closure
-2. encrypt user database and patient database
+1. delete .gif files after app closure DONE
+2. encrypt user database and patient database DONE
 3. add overwrite function for patient database
-4. figure out how to make the progress bars work?
+4. figure out how to make the progress bars work? REMOVED
 5. fix app scaling
-6.
+6. app packaging
 
 
 note: for using git:
@@ -14,3 +14,23 @@ note: for using git:
 
 notes:
 what kind of operating system will be used
+windows 10/11
+can be build for linux/mac by running pyinstaller on one of those OSs
+ram/memory requirements - run and use, monitor task manager. 4GB estimate
+storage - 300MB (not including patient data files)
+
+
+(capscone_sigprocessing_v1) PS C:\Users\krist\PycharmProjects\capscone_sigprocessing_v1> pyinstaller .\run_with_user_authentication.py --noconfirm
+
+
+
+    '''
+        TODO:
+        1. Move creating databases for patient database and user database here (pre-startup)
+        2. Add a user with admin/admin username/pass if it doesn't exist here (pre-startup)
+        3. Remove base path
+        4. Replace database_path to use config.application_path as the root folder
+           (i.e. database_path = path.join(config.application_path, patient_data.db).
+           Should probably also make it patient_database_path.
+        5. Do similar for user database (make a user_database_path variable).
+    '''

@@ -31,7 +31,7 @@ def run_processing(patient_data, thresh, pat_num):
     # Run processing function
     temp = []
     for n in range(start_range, end_range):
-        send_to_mc = processing(array_data_nogain[:, n], fs, thresh)
+        send_to_mc = processing(array_data_nogain[:, n], fs, thresh, n)
         temp.append(send_to_mc)
 
     # Remove unwanted empty columns
@@ -72,7 +72,7 @@ def run_processing(patient_data, thresh, pat_num):
         plt.xlim([-100, 100])
         plt.ylim([-100, 100])
         ax.set_title('positions')
-        plt.savefig('frame_{0:03d}.png'.format(num))
+        plt.savefig('frame_{0:03d}.png'.format(num)) #16 42 107
 
     # Saving the frames as a gif
     images = []

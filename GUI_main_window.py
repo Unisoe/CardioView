@@ -291,10 +291,13 @@ class UiMainWindow(object):
         thresh = str(self.thresh.text())
 
         # Pull patient info
-        m_file, gif_file, pat_name, pat_num, date = get_m_file(ser_pat_name, ser_pat_num)
-
+        t_file = get_m_file(ser_pat_name, ser_pat_num)
+        if t_file is None:
+            return
+        else:
+            m_file, gif_file, pat_name, pat_num, date = t_file
         # Run Processing
-        # self.send_to_mc = RunProcessing.run_processing(m_file, thresh, pat_num)
+        self.send_to_mc = RunProcessing.run_processing(m_file, thresh, pat_num)
 
         # Display patient info edithere
         text = f"Patient Name = {pat_name}\nPatient Number = {pat_num}\nData Entry Date = {date}"

@@ -10,7 +10,7 @@ sns.set()
 sns.set_theme(style="whitegrid", palette="pastel")
 
 
-def processing(ecg, fs, user_thresh):
+def processing(ecg, fs, user_thresh, n):
     let_c = []
     let_i = []
     sig_lvl = 0
@@ -276,6 +276,8 @@ def processing(ecg, fs, user_thresh):
                       loc='lower left', ncol=4, mode="expand", borderaxespad=0.,
                       handler_map={mpatches.Circle: HandlerEllipse()})
         plt.show()
+
+        # make plot to be shown on GUI
 
     # create binary array
     send_to_mc = np.zeros(len(ecg))

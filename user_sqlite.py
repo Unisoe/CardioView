@@ -1,8 +1,11 @@
+import os
 import sqlite3
 import base64
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+
+import config
 
 # Use password for key
 hardcode = b"AZBF6223"
@@ -23,8 +26,9 @@ def new_user(username, password, re_password):
     # Convert to byte type
     byte_username = bytes(username, 'utf-8')
 
-    # Connect to database (or create it if it doesn't exist)
-    conn = sqlite3.connect('user_database.db')
+    # Connect to database
+    user_database_path = os.path.join(config.application_path, 'user_database.db')
+    conn = sqlite3.connect(user_database_path)
 
     # Create a cursor to execute SQL commands
     cursor = conn.cursor()
@@ -84,7 +88,8 @@ def get_user(username, user_password):
     byte_password = bytes(user_password, 'utf-8')
 
     # Connect to database
-    conn = sqlite3.connect('user_database.db')
+    user_database_path = os.path.join(config.application_path, 'user_database.db')
+    conn = sqlite3.connect(user_database_path)
 
     # Create cursor to execute SQL commands
     cursor = conn.cursor()
