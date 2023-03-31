@@ -22,8 +22,7 @@ storage - 300MB (not including patient data files)
 
 (capscone_sigprocessing_v1) PS C:\Users\krist\PycharmProjects\capscone_sigprocessing_v1> pyinstaller .\run_with_user_authentication.py --noconfirm
 
-
-
+remove m_file_path and replace it with file path...
     '''
         TODO:
         1. Move creating databases for patient database and user database here (pre-startup)

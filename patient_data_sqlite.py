@@ -32,8 +32,9 @@ def new_entry(m_file_path, name, number, date):
     cursor = conn.cursor()
 
     # Create database path for .m, .gif, and .png files
-    patient_file_path = os.path.join(config.application_path, 'patient_files', number)
-
+    patient_file_path = os.path.join(config.application_path, 'patient_files')
+    if not os.path.exists(patient_file_path):
+        os.makedirs(patient_file_path, exist_ok=True)
     # If entry already exists return error
     cursor.execute('''
                     SELECT COUNT(*) FROM patients
@@ -41,18 +42,13 @@ def new_entry(m_file_path, name, number, date):
                 ''', (number,))
     count = cursor.fetchone()[0]
 
-    if not os.path.exists(patient_file_path):
-        os.mkdir(patient_file_path)
-    os.makedirs(patient_file_path, exist_ok=True)
-
     if count == 1:
         popup_val = check_overwrite(cursor, conn)
         if popup_val == 0:
             return
 
     # make paths for files (now that we know they don't already exist)
-    new_m_file_path = os.path.join(patient_file_path, '.m')
-    # gif_path = os.path.join(patient_file_path, f'{number}.gif')
+    new_m_file_path = os.path.join(patient_file_path, f'{number}.m')
 
     # Move .m file to app location
     shutil.copyfile(m_file_path, new_m_file_path)
@@ -62,10 +58,9 @@ def new_entry(m_file_path, name, number, date):
 
     # Insert new entry into the table
     cursor.execute('''
-        INSERT INTO patients (m_file_path, gif_path, name, number, date)
-        VALUES (?,?,?,?,?)
-    ''', (f_patient.encrypt(bytes(m_file_path, 'utf-8')), f_patient.encrypt(bytes(patient_file_path, 'utf-8')),
-          f_patient.encrypt(bytes(name, 'utf-8')), number, f_patient.encrypt(bytes(date, 'utf-8'))))
+        INSERT INTO patients (name, number, date)
+        VALUES (?,?,?)
+    ''', (f_patient.encrypt(bytes(name, 'utf-8')), number, f_patient.encrypt(bytes(date, 'utf-8'))))
 
     # Commit changes to the database
     conn.commit()
@@ -76,7 +71,7 @@ def new_entry(m_file_path, name, number, date):
     conn.close()
 
 
-def get_m_file(ser_name, num):
+def get_patient(ser_name, num):
     # Connect to database (or create it if it doesn't exist)
     patient_database_path = os.path.join(config.application_path, 'patient_database.db')
     conn = sqlite3.connect(patient_database_path)
@@ -97,17 +92,15 @@ def get_m_file(ser_name, num):
         conn.close()
         return
 
-    # Retrieve m_file for specified patient
+    # Retrieve name and date for specified patient
     cursor.execute('''
-        SELECT name, m_file_path, gif_path, date FROM patients
+        SELECT name, date FROM patients
         WHERE number = ?
     ''', (num,))
 
     # Fetch tuple (there should only be one)
-    name_e, m_file_path_e, gif_path_e, date_e = cursor.fetchone()
+    name_e, date_e = cursor.fetchone()
     name = f_patient.decrypt(name_e)
-    m_file_path = f_patient.decrypt(m_file_path_e)
-    gif_path = f_patient.decrypt(gif_path_e)
     date = f_patient.decrypt(date_e)
 
     if ser_name != name.decode('utf-8'):
@@ -120,35 +113,35 @@ def get_m_file(ser_name, num):
     cursor.close()
     conn.close()
 
-    return m_file_path.decode('utf-8'), gif_path.decode('utf-8'), name.decode('utf-8'), num, date.decode('utf-8')
+    return name.decode('utf-8'), num, date.decode('utf-8')
 
-def get_file_path(num):
-    # Connect to database (or create it if it doesn't exist)
-    patient_database_path = os.path.join(config.application_path, 'patient_database.db')
-    conn = sqlite3.connect(patient_database_path)
-
-    # Create a cursor to execute SQL commands
-    cursor = conn.cursor()
-
-    # Retrieve m_file for specified patient
-    cursor.execute('''
-        SELECT gif_path FROM patients
-        WHERE number = ?
-    ''', (num,))
-
-    # Fetch tuple (there should only be one)
-    gif_path_e = cursor.fetchone()[0]
-    gif_path = bytes.decode(f_patient.decrypt(gif_path_e), 'utf-8')
-
-    # Close cursor and connection
-    cursor.close()
-    conn.close()
-
-    return gif_path
+# def get_file_path(num):
+#     # Connect to database (or create it if it doesn't exist)
+#     patient_database_path = os.path.join(config.application_path, 'patient_database.db')
+#     conn = sqlite3.connect(patient_database_path)
+#
+#     # Create a cursor to execute SQL commands
+#     cursor = conn.cursor()
+#
+#     # Retrieve m_file for specified patient
+#     cursor.execute('''
+#         SELECT gif_path FROM patients
+#         WHERE number = ?
+#     ''', (num,))
+#
+#     # Fetch tuple (there should only be one)
+#     gif_path_e = cursor.fetchone()[0]
+#     gif_path = bytes.decode(f_patient.decrypt(gif_path_e), 'utf-8')
+#
+#     # Close cursor and connection
+#     cursor.close()
+#     conn.close()
+#
+#     return gif_path
 
 def error_popup(text):
     msg_box = QMessageBox()
-    msg_box.setWindowTitle("Attention") #maybe replace with our brand name edithere
+    msg_box.setWindowTitle("Cardioview") #maybe replace with our brand name edithere
     msg_box.setText(text)
     stylesheet = "QWidget { font-size: 15px; }"
     msg_box.setStyleSheet(stylesheet)
@@ -157,7 +150,7 @@ def error_popup(text):
 def check_overwrite(cursor, conn):
     msg_box = QMessageBox()
     msg_box.setIcon(QMessageBox.Question)
-    msg_box.setWindowTitle("Existing Patient")
+    msg_box.setWindowTitle("Cardioview")
     msg_box.setText("Data for this patient number already exists in the database. \n\nWould you like to overwrite it?")
     msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
     msg_box.setDefaultButton(QMessageBox.Cancel)

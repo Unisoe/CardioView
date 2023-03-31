@@ -4,7 +4,7 @@ from user_sqlite import new_user
 class NewUserDialog(QDialog):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("New User")
+        self.setWindowTitle("Cardioview")
         self.username = QLineEdit(self)
         self.password = QLineEdit(self)
         self.re_password = QLineEdit(self)

@@ -1,6 +1,5 @@
 import os
-
-import imageio
+import config
 import numpy as np
 import scipy as sc
 import matplotlib.pyplot as plt
@@ -13,7 +12,7 @@ sns.set()
 sns.set_theme(style="whitegrid", palette="pastel")
 
 
-def processing(ecg, fs, user_thresh, n, file_path):
+def processing(ecg, fs, user_thresh, electrode_num, pat_num):
     let_c = []
     let_i = []
     sig_lvl = 0
@@ -54,33 +53,14 @@ def processing(ecg, fs, user_thresh, n, file_path):
     ecg_butt = sc.signal.filtfilt(b, a, ecg)
     ecg_butt = ecg_butt / max(np.absolute(ecg_butt))
 
-    # if pl == 1:
-    #     plt.figure()
-    #     plt.subplot(511)
-    #     plt.plot(ecg_butt)
-    #     plt.title('5-15 Hz Bandpass filter')
-    #     plt.xlabel('Time (s)')
-
     '''derivative filter'''
     h_d = np.array([-1, -2, 0, 2, 1]) * (fs / 8)
     ecg_der = np.convolve(ecg_butt, h_d)
     ecg_der = ecg_der / max(ecg_der)
     delay = delay + 2
 
-    # if pl == 1:
-    #     plt.subplot(512)
-    #     plt.plot(ecg_der)
-    #     plt.title('derivative filt')
-    #     plt.xlabel('Time (s)')
-
     '''squaring non-linearly to enhance dominant peaks'''
     ecg_squared = np.square(ecg_der)
-
-    # if pl == 1:
-    #     plt.subplot(513)
-    #     plt.plot(ecg_squared)
-    #     plt.title('squared')
-    #     plt.xlabel('Time (s)')
 
     '''moving average'''
     len_ones = round(0.150 * fs)
@@ -89,21 +69,8 @@ def processing(ecg, fs, user_thresh, n, file_path):
     ecg_moving_avg = np.convolve(ecg_squared, array_ones)
     delay = delay + 15
 
-    # if pl == 1:
-    #     plt.subplot(514)
-    #     plt.plot(ecg_moving_avg)
-    #     plt.title('moving avg')
-    #     plt.xlabel('Time (s)')
-
     '''take the derivative'''
     ecg_moving_avg = np.diff(ecg_moving_avg)
-
-    # if pl == 1:
-    #     plt.subplot(515)
-    #     plt.plot(ecg_moving_avg)
-    #     plt.title('moving avg derivative')
-    #     plt.xlabel('Time (s)')
-    #     plt.show()
 
     '''fiducial mark'''
     locs, properties = sc.signal.find_peaks(ecg_moving_avg, distance=round(0.2 * fs))
@@ -141,9 +108,7 @@ def processing(ecg, fs, user_thresh, n, file_path):
             comp = let_i[-1] - let_i[-2]  # latest set of peaks
             if 1.16 * mean_p <= comp or comp <= 0.92 * mean_p:
                 sig_thresh = 0.5 * sig_thresh * thresh  # lower thresh to detect better in MVI
-                # noise_thresh = 0.5 * noise_thresh
                 sig_thresh1 = 0.5 * sig_thresh1 * thresh  # lower thresh to detect better in bandpass filt
-                # noise_thresh1 = 0.5 * noise_thresh1
             else:
                 m_selected_p = mean_p  # latest regular beats mean
 
@@ -228,7 +193,7 @@ def processing(ecg, fs, user_thresh, n, file_path):
         not_noise = 0
         ser_back = 0
 
-    if n == 16 or n == 50 or n == 107:
+    if electrode_num == 16 or electrode_num == 50 or electrode_num == 107:
         # plotting
         plt.figure(figsize=(10,3))
         plt.ylim(ymax = 1.27, ymin = -1)
@@ -249,11 +214,14 @@ def processing(ecg, fs, user_thresh, n, file_path):
             plt.plot(x_vals, y_vals_t, linewidth=2, color='g', linestyle='-.')
         plt.scatter(let_i.astype(int), let_c, c='k', s=20)
 
-        # # add legend
+        # add legend
         plt.legend(handles=[r_label, m_label, g_label, k_vert],
                       loc='upper left', ncol=4, mode="expand", borderaxespad=0.,
                       handler_map={mpatches.Circle: HandlerEllipse()})
-        plt.savefig(os.path.join(file_path, str(n), '.png'))
+
+        # Save fig
+        png_path = os.path.join(config.patient_file_path, f'{pat_num}{electrode_num}.png')
+        plt.savefig(png_path)
 
     # create binary array
     send_to_mc = np.zeros(len(ecg))

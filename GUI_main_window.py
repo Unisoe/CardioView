@@ -1,7 +1,15 @@
+import os
+import threading
+
+import numpy as np
+from PIL import Image
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox, QGridLayout
-from patient_data_sqlite import new_entry, get_m_file
+
+import config
+from patient_data_sqlite import new_entry, get_patient
 from popup import NewUserDialog
 import RunProcessing
 import serial
@@ -10,8 +18,17 @@ import struct
 class UiMainWindow(object):
     def __init__(self):
         super().__init__()
+        self.pixmap3 = None
+        self.pixmap2 = None
+        self.pixmap1 = None
+        self.disp_graph_3 = None
+        self.disp_graph_2 = None
+        self.disp_graph_1 = None
+        self.rightLayout = None
+        self.leftLayout = None
+        self.resizing = None
+        self.gif = None
         self.popup_user_window = None
-        self.movie = None
         self.send_to_mc = None
         self.new_user = None
         self.timer = None
@@ -61,7 +78,7 @@ class UiMainWindow(object):
         self.outerLayout = QtWidgets.QHBoxLayout(self.centralwidget)
         self.outerLayout.setObjectName("outerLayout")
 
-        stylesheet = "QWidget { font-size: 15px; }"
+        stylesheet = "QWidget { font_title-size: 15px; }"
         self.centralwidget.setStyleSheet(stylesheet)
         self.leftLayout = QGridLayout()
         self.rightLayout = QGridLayout()
@@ -91,18 +108,16 @@ class UiMainWindow(object):
         self.rightLayout.addWidget(self.connect_mc, 10, 5, 1, 1)
 
         self.get_pat_data_title = QtWidgets.QLabel(self.centralwidget)
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        self.get_pat_data_title.setFont(font)
+        font_title = QtGui.QFont()
+        font_title.setBold(True)
+        font_title.setWeight(75)
+        self.get_pat_data_title.setFont(font_title)
         self.get_pat_data_title.setAlignment(QtCore.Qt.AlignCenter)
         self.get_pat_data_title.setObjectName("Get Patient Data Title")
         self.rightLayout.addWidget(self.get_pat_data_title, 7, 2, 1, 4)
 
         self.thresh_txt = QtWidgets.QLabel(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.thresh_txt.sizePolicy().hasHeightForWidth())
         self.thresh_txt.setSizePolicy(sizePolicy)
         self.thresh_txt.setObjectName("Thresh Label")
@@ -115,18 +130,12 @@ class UiMainWindow(object):
         self.rightLayout.addWidget(self.line_get, 6, 2, 1, 4)
 
         self.pat_num_txt1 = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pat_num_txt1.sizePolicy().hasHeightForWidth())
         self.pat_num_txt1.setSizePolicy(sizePolicy)
         self.pat_num_txt1.setObjectName("New Pat Num Label")
         self.rightLayout.addWidget(self.pat_num_txt1, 4, 2, 1, 1)
 
         self.pat_name_get = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pat_name_get.sizePolicy().hasHeightForWidth())
         self.pat_name_get.setSizePolicy(sizePolicy)
         self.pat_name_get.setObjectName("Get Patient Label")
@@ -139,10 +148,10 @@ class UiMainWindow(object):
         self.rightLayout.addWidget(self.upload_database, 5, 5, 1, 1)  # edithere
 
         self.new_pat_data_title = QtWidgets.QLabel(self.centralwidget)
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        self.new_pat_data_title.setFont(font)
+        font_title = QtGui.QFont()
+        font_title.setBold(True)
+        font_title.setWeight(75)
+        self.new_pat_data_title.setFont(font_title)
         self.new_pat_data_title.setAlignment(QtCore.Qt.AlignCenter)
         self.new_pat_data_title.setObjectName("lineEdit_6")
         self.rightLayout.addWidget(self.new_pat_data_title, 1, 2, 1, 4)
@@ -230,29 +239,30 @@ class UiMainWindow(object):
 
         # Create a figure and axis for the gif
         self.disp_graph_gif = QtWidgets.QLabel(self.centralwidget)
-        self.disp_graph_gif.setMinimumSize(QtCore.QSize(200, 200))
-        self.disp_graph_gif.setBaseSize(QtCore.QSize(200, 200))
+        self.disp_graph_gif.setMinimumSize(QtCore.QSize(300,225))
+        self.disp_graph_gif.setBaseSize(QtCore.QSize(300, 225))
+
         self.disp_graph_gif.setObjectName("disp_graph_gif")
         self.leftLayout.addWidget(self.disp_graph_gif, 2, 1, 1, 1)
 
         # Create a figure and axis for
         self.disp_graph_1 = QtWidgets.QLabel(self.centralwidget)
-        self.disp_graph_1.setMinimumSize(QtCore.QSize(200, 200))
-        self.disp_graph_1.setBaseSize(QtCore.QSize(200, 200))
+        self.disp_graph_1.setMinimumSize(QtCore.QSize(300,90))
+        self.disp_graph_1.setBaseSize(QtCore.QSize(300,90))
         self.disp_graph_1.setObjectName("disp_graph_1")
         self.leftLayout.addWidget(self.disp_graph_1, 4, 1, 1, 1)
 
         # Create a figure and axis
         self.disp_graph_2 = QtWidgets.QLabel(self.centralwidget)
-        self.disp_graph_2.setMinimumSize(QtCore.QSize(200, 200))
-        self.disp_graph_2.setBaseSize(QtCore.QSize(200, 200))
+        self.disp_graph_2.setMinimumSize(QtCore.QSize(300,90))
+        self.disp_graph_2.setBaseSize(QtCore.QSize(300,90))
         self.disp_graph_2.setObjectName("disp_graph_2")
         self.leftLayout.addWidget(self.disp_graph_2, 5, 1, 1, 1)
 
         # Create a figure and axis
         self.disp_graph_3 = QtWidgets.QLabel(self.centralwidget)
-        self.disp_graph_3.setMinimumSize(QtCore.QSize(200, 200))
-        self.disp_graph_3.setBaseSize(QtCore.QSize(200, 200))
+        self.disp_graph_3.setMinimumSize(QtCore.QSize(300,90))
+        self.disp_graph_3.setBaseSize(QtCore.QSize(300,90))
         self.disp_graph_3.setObjectName("disp_graph_3")
         self.leftLayout.addWidget(self.disp_graph_3, 6, 1, 1, 1)
 
@@ -292,18 +302,38 @@ class UiMainWindow(object):
 
         self.popup_user_window = NewUserDialog()
         self.popup_user_window.show()
-        
-    def no_pat_window(self):
-        QMessageBox.about(self, "Error", "This patient does not exist.")
 
-    def connect_to_model(self):
-        ser = serial.Serial('COM3', 9600)  # Replace with the appropriate serial port
-        matrix = self.send_to_mc
+    def connect_to_model(self): #edithere
+        import serial
+        import time
 
-        data = struct.pack('<112i', *sum(matrix, []))
+        ser = serial.Serial()  # initialize serial communication
+        ser.baudrate = 9600
+        ser.port = None
+        ser.timeout = 1
 
-        ser.write(data)
-        ser.close()
+        print("Searching for available ports...")
+        time.sleep(1)
+
+        portNames = []  # find available serial ports
+        portCount = 0
+        while True:
+            line = ser.readline().decode().strip()
+            if line.startswith("COM"):
+                portNames.append(line.split(":")[0])
+                print(str(portCount) + ". " + portNames[portCount])
+                portCount += 1
+            if not ser.inWaiting():
+                break
+
+        selectedPort = -1  # ask user to select a port
+        while selectedPort < 0 or selectedPort >= portCount:
+            selectedPort = int(input("Select a port number (0-" + str(portCount - 1) + "): "))
+
+        ser.port = portNames[selectedPort]  # connect to the selected port
+        ser.open()
+
+        print("Connected to " + ser.port)
 
     def ser_pat_info(self):
         # User input
@@ -312,41 +342,87 @@ class UiMainWindow(object):
         thresh = str(self.thresh.text())
 
         # Pull patient info
-        t_file = get_m_file(ser_pat_name, ser_pat_num)
+        t_file = get_patient(ser_pat_name, ser_pat_num)
         if t_file is None:
             return
         else:
-            m_file, gif_file, pat_name, pat_num, date = t_file
+            pat_name, pat_num, date = t_file
+            m_file = os.path.join(config.patient_file_path, f'{pat_num}.m')
+            gif_file = os.path.join(config.patient_file_path, f'{pat_num}.gif')
         # Run Processing
-        self.send_to_mc = RunProcessing.run_processing(m_file, thresh, pat_num)
+        msg_box = QMessageBox()
+        msg_box.setText("Patient data is being processed, please wait.")
+        msg_box.setWindowTitle("Cardioview")
+        msg_box.show()
+        # self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
+        msg_box.close()
 
-        # Display patient info edithere
-        text = f"Patient Name = {pat_name}\nPatient Number = {pat_num}\nData Entry Date = {date}"
+        # Display patient info
+        text = f"Patient Name:  {pat_name}\nPatient Number:  {pat_num}\nDate of File Creation:  {date}"
         self.disp_patient.setText(text)
 
         # Display gif
-        gif = QtGui.QMovie(gif_file)
-        self.disp_graph_gif.setMovie(gif)
-        gif_size = QPixmap(gif_file).size()
-        self.disp_graph_gif.resize(gif_size) #resize the gif
-        gif.start()
-        self.movie.started.connect(lambda: self.disp_speed.setEnabled(True))
-        self.movie.finished.connect(lambda: self.disp_speed.setEnabled(False))
+        self.gif = QtGui.QMovie(gif_file)
+        self.pixmap1 = QPixmap(os.path.join(config.patient_file_path, f'{pat_num}16.png'))
+        self.disp_graph_1.setPixmap(self.pixmap1)
+        self.pixmap2 = QPixmap(os.path.join(config.patient_file_path, f'{pat_num}50.png'))
+        self.disp_graph_2.setPixmap(self.pixmap2)
+        self.pixmap3 = QPixmap(os.path.join(config.patient_file_path, f'{pat_num}107.png'))
+        self.disp_graph_3.setPixmap(self.pixmap3)
+
+        self.gif.frameChanged.connect(self.update_gif)
+        self.gif.start()
+        self.resizing = False
+        self.disp_graph_gif.setMovie(self.gif)
+        self.gif.start()
+        # self.gif.started.connect(lambda: self.disp_speed.setEnabled(True))
+        # self.gif.finished.connect(lambda: self.disp_speed.setEnabled(False))
+
+    def update_gif(self):
+        # get the current pixmap from the gif
+        pixmap = self.gif.currentPixmap()
+
+        # create a QTransform to scale the pixmap to the size of the gif
+        width = int(self.new_user.width())
+        gif_height = int(np.ceil(0.75*width))
+        png_height = int(np.ceil(0.3*width))
+        transform = QtGui.QTransform().scale(width / pixmap.width(), gif_height / pixmap.height())
+        pixmap = pixmap.transformed(transform, QtCore.Qt.SmoothTransformation)
+
+        # set the pixmap on the label
+        self.disp_graph_gif.setPixmap(pixmap)
+        self.disp_graph_1.setPixmap(self.pixmap1.scaled(width, png_height, transformMode=Qt.SmoothTransformation))
+        self.disp_graph_2.setPixmap(self.pixmap1.scaled(width, png_height, transformMode=Qt.SmoothTransformation))
+        self.disp_graph_3.setPixmap(self.pixmap1.scaled(width, png_height, transformMode=Qt.SmoothTransformation))
+
+    def resizeEvent(self, event):
+        if self.resizing:
+            # if the window is being resized by the user, update the size of the label and set the resizing flag to False
+            width = int(self.new_user.width())
+            gif_height = int(np.ceil(0.75 * width))
+            png_height = int(np.ceil(0.3 * width))
+            self.disp_graph_gif.setFixedSize(width, gif_height)
+            self.disp_graph_1.setFixedSize(width, png_height)
+            self.disp_graph_2.setFixedSize(width, png_height)
+            self.disp_graph_3.setFixedSize(width, png_height)
+
+            self.resizing = False
+        else:
+            # if the window is being resized programmatically, set the resizing flag to True and do not update the label
+            self.resizing = True
 
     def slider_value_changed(self, value): #edithere
         # Set the speed of the GIF based on the value of the slider
-        self.gif.setSpeed(value*10)
-
+        self.disp_graph_gif.setSpeed(value*10)
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Cardioview"))
         self.new_user.setText(_translate("MainWindow", "New User"))
         self.get_pat_data_title.setText(_translate("MainWindow", "GET PATIENT DATA"))
         self.thresh_txt.setText(_translate("MainWindow", "Threshold:"))
         self.view_data.setText(_translate("MainWindow", "View Data"))
         self.pat_num_txt1.setText(_translate("MainWindow", "Patient Number:"))
         self.pat_name_get.setText(_translate("MainWindow", "Patient Name:"))
-        # self.upload_mc.setText(_translate("MainWindow", "Upload to Model"))
         self.connect_mc.setText(_translate("MainWindow", "Connect to Model"))
         self.upload_database.setText(_translate("MainWindow", "Upload to Database"))
         self.new_pat_data_title.setText(_translate("MainWindow", "NEW PATIENT DATA"))

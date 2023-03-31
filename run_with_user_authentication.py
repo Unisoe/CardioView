@@ -8,7 +8,7 @@ from start_close import on_close, on_startup
 class LoginDialog(QDialog):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Login")
+        self.setWindowTitle("Cardioview")
         self.username = QLineEdit(self)
         self.password = QLineEdit(self)
         self.password.setEchoMode(QLineEdit.Password)
@@ -25,11 +25,13 @@ class LoginDialog(QDialog):
         cancel_button.clicked.connect(self.reject)
         stylesheet = "QWidget { font-size: 15px; }"
         self.setStyleSheet(stylesheet)
+        print(self.size())
 
     def login(self):
         username = self.username.text()
         password = self.password.text()
         accepted = get_user(username, password)
+
         # check if username and password are correct
         if accepted == 1:
             self.accept()
@@ -53,4 +55,4 @@ if __name__ == "__main__":
         sys.exit(app.exec_())
     else:
         sys.exit(app.exec_())
-    sys.exit(app.exec_())
+    # sys.exit(app.exec_())
