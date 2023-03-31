@@ -1,6 +1,4 @@
 import os
-import threading
-
 import numpy as np
 from PIL import Image
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -13,11 +11,14 @@ from patient_data_sqlite import new_entry, get_patient
 from popup import NewUserDialog
 import RunProcessing
 import serial
+import time
 import struct
 
+stylesheet = "QWidget { font_title-size: 15px; }"
 class UiMainWindow(object):
     def __init__(self):
         super().__init__()
+        self.msg_box = None
         self.pixmap3 = None
         self.pixmap2 = None
         self.pixmap1 = None
@@ -31,12 +32,6 @@ class UiMainWindow(object):
         self.popup_user_window = None
         self.send_to_mc = None
         self.new_user = None
-        self.timer = None
-        self.y_coord = None
-        self.x_coord = None
-        self.pat_matrix = None
-        self.axis = None
-        self.figure = None
         self.centralwidget = None
         self.connect_mc = None
         self.date = None
@@ -46,7 +41,6 @@ class UiMainWindow(object):
         self.file_search = None
         self.outerLayout = None
         self.line_get = None
-        self.line_new = None
         self.date_txt = None
         self.pat_name_get = None
         self.pat_num_txt1 = None
@@ -60,8 +54,6 @@ class UiMainWindow(object):
         self.menubar = None
         self.new_pat_name = None
         self.new_pat_num = None
-        self.prog_database = None
-        self.prog_mc = None
         self.ser_pat_name = None
         self.ser_pat_num = None
         self.statusbar = None
@@ -78,7 +70,6 @@ class UiMainWindow(object):
         self.outerLayout = QtWidgets.QHBoxLayout(self.centralwidget)
         self.outerLayout.setObjectName("outerLayout")
 
-        stylesheet = "QWidget { font_title-size: 15px; }"
         self.centralwidget.setStyleSheet(stylesheet)
         self.leftLayout = QGridLayout()
         self.rightLayout = QGridLayout()
@@ -304,15 +295,12 @@ class UiMainWindow(object):
         self.popup_user_window.show()
 
     def connect_to_model(self): #edithere
-        import serial
-        import time
-
         ser = serial.Serial()  # initialize serial communication
         ser.baudrate = 9600
         ser.port = None
         ser.timeout = 1
 
-        print("Searching for available ports...")
+        print("Searching for available ports...") # edithere popup
         time.sleep(1)
 
         portNames = []  # find available serial ports
@@ -321,20 +309,24 @@ class UiMainWindow(object):
             line = ser.readline().decode().strip()
             if line.startswith("COM"):
                 portNames.append(line.split(":")[0])
-                print(str(portCount) + ". " + portNames[portCount])
+                print(str(portCount) + ". " + portNames[portCount]) # edithere popup
                 portCount += 1
             if not ser.inWaiting():
                 break
 
         selectedPort = -1  # ask user to select a port
         while selectedPort < 0 or selectedPort >= portCount:
-            selectedPort = int(input("Select a port number (0-" + str(portCount - 1) + "): "))
+            selectedPort = int(input("Select a port number (0-" + str(portCount - 1) + "): ")) # edithere popup
 
         ser.port = portNames[selectedPort]  # connect to the selected port
         ser.open()
 
-        print("Connected to " + ser.port)
+        print("Connected to " + ser.port) # edithere make this into a popup
 
+        matrix = self.send_to_mc,  # single line array
+        # data = struct.pack('<112i', *sum(matrix, []))
+        ser.write(matrix)
+        ser.close()
     def ser_pat_info(self):
         # User input
         ser_pat_name = str(self.ser_pat_name.text())
@@ -350,12 +342,12 @@ class UiMainWindow(object):
             m_file = os.path.join(config.patient_file_path, f'{pat_num}.m')
             gif_file = os.path.join(config.patient_file_path, f'{pat_num}.gif')
         # Run Processing
-        msg_box = QMessageBox()
-        msg_box.setText("Patient data is being processed, please wait.")
-        msg_box.setWindowTitle("Cardioview")
-        msg_box.show()
+        self.msg_box = QMessageBox()
+        self.msg_box.setText("Patient data is being processed, please wait.")
+        self.msg_box.setWindowTitle("Cardioview")
+        self.msg_box.show()
         # self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
-        msg_box.close()
+        self.msg_box.close()
 
         # Display patient info
         text = f"Patient Name:  {pat_name}\nPatient Number:  {pat_num}\nDate of File Creation:  {date}"
