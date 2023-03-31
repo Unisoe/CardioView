@@ -14,7 +14,7 @@ import serial
 import time
 import struct
 
-stylesheet = "QWidget { font_title-size: 15px; }"
+
 class UiMainWindow(object):
     def __init__(self):
         super().__init__()
@@ -70,6 +70,7 @@ class UiMainWindow(object):
         self.outerLayout = QtWidgets.QHBoxLayout(self.centralwidget)
         self.outerLayout.setObjectName("outerLayout")
 
+        stylesheet = "QWidget { font_title-size: 15px; }"
         self.centralwidget.setStyleSheet(stylesheet)
         self.leftLayout = QGridLayout()
         self.rightLayout = QGridLayout()
@@ -220,7 +221,7 @@ class UiMainWindow(object):
         # Patient info display
         self.disp_patient = QtWidgets.QLabel(self.centralwidget)
         self.disp_patient.setObjectName("disp_patient")
-        self.leftLayout.addWidget(self.disp_patient, 7, 1, 1, 1)
+        self.rightLayout.addWidget(self.disp_patient, 11, 1, 1, 4) #
 
         # New user button
         self.new_user = QtWidgets.QPushButton(self.centralwidget)  # edithere
@@ -272,7 +273,6 @@ class UiMainWindow(object):
 
         self.outerLayout.addLayout(self.leftLayout)
         self.outerLayout.addLayout(self.rightLayout)
-        self.setLayout(self.outerLayout)
 
     def openFileNameDialog(self):
         options = QtWidgets.QFileDialog.Options()
@@ -349,7 +349,7 @@ class UiMainWindow(object):
         # self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
         self.msg_box.close()
 
-        # Display patient info
+        # Display patient info \033[1m  Your Name  \033[0m
         text = f"Patient Name:  {pat_name}\nPatient Number:  {pat_num}\nDate of File Creation:  {date}"
         self.disp_patient.setText(text)
 
@@ -367,8 +367,8 @@ class UiMainWindow(object):
         self.resizing = False
         self.disp_graph_gif.setMovie(self.gif)
         self.gif.start()
-        # self.gif.started.connect(lambda: self.disp_speed.setEnabled(True))
-        # self.gif.finished.connect(lambda: self.disp_speed.setEnabled(False))
+        self.gif.started.connect(lambda: self.disp_speed.setEnabled(True))
+        self.gif.finished.connect(lambda: self.disp_speed.setEnabled(False))
 
     def update_gif(self):
         # get the current pixmap from the gif
