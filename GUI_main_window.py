@@ -1,18 +1,15 @@
 import os
 import numpy as np
-from PIL import Image
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox, QGridLayout
-
 import config
 from patient_data_sqlite import new_entry, get_patient
 from popup import NewUserDialog
 import RunProcessing
 import serial
 import time
-import struct
 
 
 class UiMainWindow(object):
@@ -65,6 +62,7 @@ class UiMainWindow(object):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
+        self.setWindowIcon(QtGui.QIcon('Logo.png'))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.outerLayout = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -344,9 +342,10 @@ class UiMainWindow(object):
         # Run Processing
         self.msg_box = QMessageBox()
         self.msg_box.setText("Patient data is being processed, please wait.")
-        self.msg_box.setWindowTitle("Cardioview")
+        self.msg_box.setWindowTitle("CardioView")
+        self.msg_box.setIcon("Logo.png")
         self.msg_box.show()
-        # self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
+        self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
         self.msg_box.close()
 
         # Display patient info \033[1m  Your Name  \033[0m
@@ -408,7 +407,7 @@ class UiMainWindow(object):
         self.disp_graph_gif.setSpeed(value*10)
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Cardioview"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "CardioView"))
         self.new_user.setText(_translate("MainWindow", "New User"))
         self.get_pat_data_title.setText(_translate("MainWindow", "GET PATIENT DATA"))
         self.thresh_txt.setText(_translate("MainWindow", "Threshold:"))

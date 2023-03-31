@@ -141,7 +141,8 @@ def get_patient(ser_name, num):
 
 def error_popup(text):
     msg_box = QMessageBox()
-    msg_box.setWindowTitle("Cardioview") #maybe replace with our brand name edithere
+    msg_box.setIcon("Logo.png")
+    msg_box.setWindowTitle("CardioView") #maybe replace with our brand name edithere
     msg_box.setText(text)
     stylesheet = "QWidget { font-size: 15px; }"
     msg_box.setStyleSheet(stylesheet)
@@ -149,8 +150,8 @@ def error_popup(text):
 
 def check_overwrite(cursor, conn):
     msg_box = QMessageBox()
-    msg_box.setIcon(QMessageBox.Question)
-    msg_box.setWindowTitle("Cardioview")
+    msg_box.setIcon("Logo.png")
+    msg_box.setWindowTitle("CardioView")
     msg_box.setText("Data for this patient number already exists in the database. \n\nWould you like to overwrite it?")
     msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
     msg_box.setDefaultButton(QMessageBox.Cancel)

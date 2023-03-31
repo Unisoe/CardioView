@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QApplication, QDialog, QLineEdit, QPushButton, QVBoxLayout, QLabel, QMessageBox
+from PyQt5 import QtGui
 from RunUI_main_window import MainWindow
 from user_sqlite import get_user
 import sys
@@ -8,7 +9,8 @@ from start_close import on_close, on_startup
 class LoginDialog(QDialog):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Cardioview")
+        self.setWindowTitle("CardioView")
+        self.setWindowIcon(QtGui.QIcon("Logo.png"))
         self.username = QLineEdit(self)
         self.password = QLineEdit(self)
         self.password.setEchoMode(QLineEdit.Password)

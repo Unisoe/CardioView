@@ -4,7 +4,8 @@ from user_sqlite import new_user
 class NewUserDialog(QDialog):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Cardioview")
+        self.setWindowTitle("CardioView")
+        self.setIcon("Logo.png")
         self.username = QLineEdit(self)
         self.password = QLineEdit(self)
         self.re_password = QLineEdit(self)
@@ -23,7 +24,7 @@ class NewUserDialog(QDialog):
         layout.addWidget(cancel_button)
         new_user_button.clicked.connect(self.new_authentication)
         cancel_button.clicked.connect(self.reject)
-        stylesheet = "QWidget { font-size: 30px; }"
+        stylesheet = "QWidget { font-size: 15px; }"
         self.setStyleSheet(stylesheet)
 
     def new_authentication(self):
@@ -31,14 +32,17 @@ class NewUserDialog(QDialog):
         password = self.password.text()
         re_password = self.re_password.text()
         accepted = new_user(username, password, re_password)
+        msg_box = QMessageBox()
+        msg_box.setIcon("Logo.png")
+        msg_box.setWindowTitle("CardioView")
 
         # Check database
         if accepted == 0:
-            QMessageBox.about(self, "Error", "Username already exists")
+            msg_box.setText("Error: Username already exists")
         elif accepted == 1:
-            QMessageBox.about(self, "Error", "Passwords do not match")
+            msg_box.setText("Error: Username already exists")
         elif accepted == 2:
+            msg_box.setText("New User Created")
             self.accept()
         else:
-            # display error message
-            QMessageBox.about(self, "Error", "Unknown Error")
+            msg_box.setText("Error: Unknown Error Occurred")

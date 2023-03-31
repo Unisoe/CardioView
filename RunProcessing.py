@@ -1,6 +1,5 @@
 import numpy as np
 import os
-from PyQt5.QtWidgets import QMessageBox
 from processing import processing
 from mat4py import loadmat
 import matplotlib.pyplot as plt
