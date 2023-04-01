@@ -52,7 +52,6 @@ def run_processing(patient_data, gif_path, thresh, pat_num):
 
     # Plotting
     fig, ax = plt.subplots()
-    plt.figure(figsize=(10, 7.5))
     for num in range(downsample.shape[1]):
         ax.clear()
         for m in range(112):
@@ -77,5 +76,5 @@ def run_processing(patient_data, gif_path, thresh, pat_num):
 
     return flattened_data
 
-# call function to run
-# run_processing("C:/Users/krist/PycharmProjects/capscone_sigprocessing_v1/vt1_sample.mat", 1, 123456789)
+# call function to run patient_data, gif_path, thresh, pat_num
+# run_processing("C:/Users/krist/PycharmProjects/capscone_sigprocessing_v1/vt1_sample.mat", "C:/Users/krist/PycharmProjects/capscone_sigprocessing_v1/patient_files/123456789.gif", 1, 123456789)

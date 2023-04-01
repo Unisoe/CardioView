@@ -2,6 +2,7 @@ import sqlite3
 import shutil
 import os
 from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtGui import QPixmap
 import base64
 import config
 from cryptography.fernet import Fernet
@@ -46,6 +47,7 @@ def new_entry(m_file_path, name, number, date):
         popup_val = check_overwrite(cursor, conn)
         if popup_val == 0:
             return
+
 
     # make paths for files (now that we know they don't already exist)
     new_m_file_path = os.path.join(patient_file_path, f'{number}.m')
@@ -115,42 +117,18 @@ def get_patient(ser_name, num):
 
     return name.decode('utf-8'), num, date.decode('utf-8')
 
-# def get_file_path(num):
-#     # Connect to database (or create it if it doesn't exist)
-#     patient_database_path = os.path.join(config.application_path, 'patient_database.db')
-#     conn = sqlite3.connect(patient_database_path)
-#
-#     # Create a cursor to execute SQL commands
-#     cursor = conn.cursor()
-#
-#     # Retrieve m_file for specified patient
-#     cursor.execute('''
-#         SELECT gif_path FROM patients
-#         WHERE number = ?
-#     ''', (num,))
-#
-#     # Fetch tuple (there should only be one)
-#     gif_path_e = cursor.fetchone()[0]
-#     gif_path = bytes.decode(f_patient.decrypt(gif_path_e), 'utf-8')
-#
-#     # Close cursor and connection
-#     cursor.close()
-#     conn.close()
-#
-#     return gif_path
-
 def error_popup(text):
     msg_box = QMessageBox()
-    msg_box.setIcon("Logo.png")
-    msg_box.setWindowTitle("CardioView") #maybe replace with our brand name edithere
+    msg_box.setIconPixmap(QPixmap("Logo.png"))
+    msg_box.setWindowTitle("CardioView")
     msg_box.setText(text)
-    stylesheet = "QWidget { font-size: 15px; }"
-    msg_box.setStyleSheet(stylesheet)
+    # stylesheet = "QWidget { font-size: 15px; }"
+    # msg_box.setStyleSheet(stylesheet)
     msg_box.exec_()
 
 def check_overwrite(cursor, conn):
     msg_box = QMessageBox()
-    msg_box.setIcon("Logo.png")
+    msg_box.setIconPixmap(QPixmap("Logo.png"))
     msg_box.setWindowTitle("CardioView")
     msg_box.setText("Data for this patient number already exists in the database. \n\nWould you like to overwrite it?")
     msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
@@ -160,7 +138,7 @@ def check_overwrite(cursor, conn):
         # Code to execute if the user clicked "Ok"
         return 1
     else:
-        # Code to execute if the user clicked "Cancel"
+        # Code to execute if the user clicked "Cancel" or closed the window
         cursor.close()
         conn.close()
         return 0

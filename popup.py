@@ -1,11 +1,12 @@
 from PyQt5.QtWidgets import QDialog, QLineEdit, QPushButton, QVBoxLayout, QLabel, QMessageBox
 from user_sqlite import new_user
+from PyQt5.QtGui import QPixmap
 
 class NewUserDialog(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("CardioView")
-        self.setIcon("Logo.png")
+        # self.setIconPixmap(QPixmap("Logo.png"))
         self.username = QLineEdit(self)
         self.password = QLineEdit(self)
         self.re_password = QLineEdit(self)
@@ -33,16 +34,19 @@ class NewUserDialog(QDialog):
         re_password = self.re_password.text()
         accepted = new_user(username, password, re_password)
         msg_box = QMessageBox()
-        msg_box.setIcon("Logo.png")
+        msg_box.setIconPixmap(QPixmap("Logo.png"))
         msg_box.setWindowTitle("CardioView")
 
         # Check database
         if accepted == 0:
             msg_box.setText("Error: Username already exists")
+            msg_box.show()
         elif accepted == 1:
-            msg_box.setText("Error: Username already exists")
+            msg_box.setText("Error: Passwords do not match")
+            msg_box.show()
         elif accepted == 2:
             msg_box.setText("New User Created")
+            msg_box.show()
             self.accept()
         else:
             msg_box.setText("Error: Unknown Error Occurred")

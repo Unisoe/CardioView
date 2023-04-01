@@ -339,16 +339,19 @@ class UiMainWindow(object):
             pat_name, pat_num, date = t_file
             m_file = os.path.join(config.patient_file_path, f'{pat_num}.m')
             gif_file = os.path.join(config.patient_file_path, f'{pat_num}.gif')
-        # Run Processing
-        self.msg_box = QMessageBox()
-        self.msg_box.setText("Patient data is being processed, please wait.")
-        self.msg_box.setWindowTitle("CardioView")
-        self.msg_box.setIcon("Logo.png")
-        self.msg_box.show()
-        self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
-        self.msg_box.close()
 
-        # Display patient info \033[1m  Your Name  \033[0m
+        # Run Processing
+        msg_box = QMessageBox()
+        msg_box.setText("Patient data is being processed, please wait.")
+        msg_box.setWindowTitle("CardioView")
+        stylesheet = "QWidget { font_title-size: 15px; }"
+        msg_box.setStyleSheet(stylesheet)
+        msg_box.setIconPixmap(QPixmap("Logo.png"))
+        msg_box.show()
+        self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
+        msg_box.close()
+
+        # Display patient info
         text = f"Patient Name:  {pat_name}\nPatient Number:  {pat_num}\nDate of File Creation:  {date}"
         self.disp_patient.setText(text)
 

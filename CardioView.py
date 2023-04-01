@@ -40,7 +40,7 @@ class LoginDialog(QDialog):
         else:
             # display error message
             self.password.clear()
-            QMessageBox.about(self, "Error", "Incorrect username or password")
+            QMessageBox.about(self, "CardioView", "Incorrect username or password")
 
 
 if __name__ == "__main__":
