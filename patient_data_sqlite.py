@@ -122,8 +122,6 @@ def error_popup(text):
     msg_box.setIconPixmap(QPixmap("Logo.png"))
     msg_box.setWindowTitle("CardioView")
     msg_box.setText(text)
-    # stylesheet = "QWidget { font-size: 15px; }"
-    # msg_box.setStyleSheet(stylesheet)
     msg_box.exec_()
 
 def check_overwrite(cursor, conn):
