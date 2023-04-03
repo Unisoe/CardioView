@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox, QGridLayout
 import config
@@ -231,7 +231,7 @@ class UiMainWindow(object):
         self.disp_graph_gif = QtWidgets.QLabel(self.centralwidget)
         self.disp_graph_gif.setMinimumSize(QtCore.QSize(300,225))
         self.disp_graph_gif.setBaseSize(QtCore.QSize(300, 225))
-
+        self.disp_graph_gif.setScaledContents(True)
         self.disp_graph_gif.setObjectName("disp_graph_gif")
         self.leftLayout.addWidget(self.disp_graph_gif, 2, 1, 1, 1)
 
@@ -239,6 +239,7 @@ class UiMainWindow(object):
         self.disp_graph_1 = QtWidgets.QLabel(self.centralwidget)
         self.disp_graph_1.setMinimumSize(QtCore.QSize(300,90))
         self.disp_graph_1.setBaseSize(QtCore.QSize(300,90))
+        self.disp_graph_1.setScaledContents(True)
         self.disp_graph_1.setObjectName("disp_graph_1")
         self.leftLayout.addWidget(self.disp_graph_1, 4, 1, 1, 1)
 
@@ -246,6 +247,7 @@ class UiMainWindow(object):
         self.disp_graph_2 = QtWidgets.QLabel(self.centralwidget)
         self.disp_graph_2.setMinimumSize(QtCore.QSize(300,90))
         self.disp_graph_2.setBaseSize(QtCore.QSize(300,90))
+        self.disp_graph_2.setScaledContents(True)
         self.disp_graph_2.setObjectName("disp_graph_2")
         self.leftLayout.addWidget(self.disp_graph_2, 5, 1, 1, 1)
 
@@ -253,6 +255,7 @@ class UiMainWindow(object):
         self.disp_graph_3 = QtWidgets.QLabel(self.centralwidget)
         self.disp_graph_3.setMinimumSize(QtCore.QSize(300,90))
         self.disp_graph_3.setBaseSize(QtCore.QSize(300,90))
+        self.disp_graph_3.setScaledContents(True)
         self.disp_graph_3.setObjectName("disp_graph_3")
         self.leftLayout.addWidget(self.disp_graph_3, 6, 1, 1, 1)
 
@@ -322,7 +325,6 @@ class UiMainWindow(object):
         print("Connected to " + ser.port) # edithere make this into a popup
 
         matrix = self.send_to_mc,  # single line array
-        # data = struct.pack('<112i', *sum(matrix, []))
         ser.write(matrix)
         ser.close()
     def ser_pat_info(self):
@@ -348,7 +350,7 @@ class UiMainWindow(object):
         msg_box.setStyleSheet(stylesheet)
         msg_box.setIconPixmap(QPixmap("Logo.png"))
         msg_box.show()
-        self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
+        # self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
         msg_box.close()
 
         # Display patient info
@@ -357,57 +359,25 @@ class UiMainWindow(object):
 
         # Display gif
         self.gif = QtGui.QMovie(gif_file)
+        self.disp_graph_gif.setMovie(self.gif)
         self.pixmap1 = QPixmap(os.path.join(config.patient_file_path, f'{pat_num}16.png'))
         self.disp_graph_1.setPixmap(self.pixmap1)
         self.pixmap2 = QPixmap(os.path.join(config.patient_file_path, f'{pat_num}50.png'))
         self.disp_graph_2.setPixmap(self.pixmap2)
         self.pixmap3 = QPixmap(os.path.join(config.patient_file_path, f'{pat_num}107.png'))
         self.disp_graph_3.setPixmap(self.pixmap3)
-
-        self.gif.frameChanged.connect(self.update_gif)
         self.gif.start()
-        self.resizing = False
-        self.disp_graph_gif.setMovie(self.gif)
-        self.gif.start()
-        self.gif.started.connect(lambda: self.disp_speed.setEnabled(True))
-        self.gif.finished.connect(lambda: self.disp_speed.setEnabled(False))
+        self.disp_speed.setEnabled(True)
 
-    def update_gif(self):
-        # get the current pixmap from the gif
-        pixmap = self.gif.currentPixmap()
-
-        # create a QTransform to scale the pixmap to the size of the gif
-        width = int(self.new_user.width())
-        gif_height = int(np.ceil(0.75*width))
-        png_height = int(np.ceil(0.3*width))
-        transform = QtGui.QTransform().scale(width / pixmap.width(), gif_height / pixmap.height())
-        pixmap = pixmap.transformed(transform, QtCore.Qt.SmoothTransformation)
-
-        # set the pixmap on the label
-        self.disp_graph_gif.setPixmap(pixmap)
-        self.disp_graph_1.setPixmap(self.pixmap1.scaled(width, png_height, transformMode=Qt.SmoothTransformation))
-        self.disp_graph_2.setPixmap(self.pixmap1.scaled(width, png_height, transformMode=Qt.SmoothTransformation))
-        self.disp_graph_3.setPixmap(self.pixmap1.scaled(width, png_height, transformMode=Qt.SmoothTransformation))
-
-    def resizeEvent(self, event):
-        if self.resizing:
-            # if the window is being resized by the user, update the size of the label and set the resizing flag to False
-            width = int(self.new_user.width())
-            gif_height = int(np.ceil(0.75 * width))
-            png_height = int(np.ceil(0.3 * width))
-            self.disp_graph_gif.setFixedSize(width, gif_height)
-            self.disp_graph_1.setFixedSize(width, png_height)
-            self.disp_graph_2.setFixedSize(width, png_height)
-            self.disp_graph_3.setFixedSize(width, png_height)
-
-            self.resizing = False
-        else:
-            # if the window is being resized programmatically, set the resizing flag to True and do not update the label
-            self.resizing = True
-
-    def slider_value_changed(self, value): #edithere
+    def slider_value_changed(self, value):
         # Set the speed of the GIF based on the value of the slider
-        self.disp_graph_gif.setSpeed(value*10)
+        self.gif.setSpeed(value)
+
+    def updateGIF(self):
+        # Update the label with the next frame of the GIF
+        pixmap = self.disp_graph_gif.pixmap()
+        pixmap = pixmap.copy()
+        self.disp_graph_gif.setPixmap(pixmap)
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "CardioView"))
