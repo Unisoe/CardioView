@@ -29,6 +29,9 @@ class NewUserDialog(QDialog):
         self.setStyleSheet(stylesheet)
 
     def new_authentication(self):
+        if self.username.text() or self.password.text() or self.re_password.text() == '':
+            QMessageBox.about(self, "CardioView", "Please fill out all required fields")
+            return
         username = self.username.text()
         password = self.password.text()
         re_password = self.re_password.text()

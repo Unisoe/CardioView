@@ -1,9 +1,7 @@
 import os
 import string
-
-import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import QDate
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox, QGridLayout
 import config
@@ -96,7 +94,7 @@ class UiMainWindow(object):
         self.rightLayout.addWidget(self.view_data, 10, 4, 1, 1)
 
         # Connect to MC button
-        self.connect_mc = QtWidgets.QPushButton(self.centralwidget) #edithere this might be the only button for connection
+        self.connect_mc = QtWidgets.QPushButton(self.centralwidget)
         self.connect_mc.setObjectName("connect_mc")
         self.connect_mc.clicked.connect(self.connect_to_model)
         self.rightLayout.addWidget(self.connect_mc, 10, 5, 1, 1)
@@ -126,7 +124,7 @@ class UiMainWindow(object):
         self.line_disp.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_disp.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_disp.setObjectName("line_disp")
-        self.rightLayout.addWidget(self.line_get, 11, 2, 1, 4)
+        self.rightLayout.addWidget(self.line_disp, 11, 2, 1, 4)
 
         self.pat_num_txt1 = QtWidgets.QLabel(self.centralwidget)
         sizePolicy.setHeightForWidth(self.pat_num_txt1.sizePolicy().hasHeightForWidth())
@@ -187,8 +185,9 @@ class UiMainWindow(object):
         self.rightLayout.addWidget(self.date_txt, 5, 2, 1, 1)
 
         self.date = QtWidgets.QDateEdit(self.centralwidget)
+        self.date.setDate(QDate.currentDate())
         self.date.setObjectName("date")
-        self.rightLayout.addWidget(self.date, 5, 3, 1, 2) #edithere
+        self.rightLayout.addWidget(self.date, 5, 3, 1, 2)
 
         # File Search Button
         self.file_search = QtWidgets.QPushButton(self.centralwidget)
@@ -280,11 +279,15 @@ class UiMainWindow(object):
 
     def new_pat_info(self):
         # User input
-        load_data = str(self.load_data.text())
-        new_pat_name = str(self.new_pat_name.text())
-        new_pat_num = int(self.new_pat_num.text())
-        new_pat_date = str(self.date.text())
-        new_entry(load_data, new_pat_name, new_pat_num, new_pat_date)
+        if str(self.load_data.text()) or str(self.new_pat_name.text()) or int(self.new_pat_num.text()) == '':
+            QMessageBox.about(self, "CardioView", "Please provide all required patient information")
+            return
+        else:
+            load_data = str(self.load_data.text())
+            new_pat_name = str(self.new_pat_name.text())
+            new_pat_num = int(self.new_pat_num.text())
+            new_pat_date = str(self.date.text())
+            new_entry(load_data, new_pat_name, new_pat_num, new_pat_date)
 
     def new_user_window(self):
 
@@ -325,9 +328,17 @@ class UiMainWindow(object):
         ser.close()
     def ser_pat_info(self):
         # User input
-        ser_pat_name = str(self.ser_pat_name.text())
-        ser_pat_num = int(self.ser_pat_num.text())
-        thresh = str(self.thresh.text())
+        if str(self.ser_pat_name.text()) or str(self.ser_pat_name.text()) == '':
+            QMessageBox.about(self, "CardioView", "Please fill out all required fields")
+            return
+        else:
+            ser_pat_name = str(self.ser_pat_name.text())
+            ser_pat_num = int(self.ser_pat_num.text())
+
+        if self.thresh.text() != '':
+            thresh = str(self.thresh.text())
+        else:
+            thresh = 1
 
         # Pull patient info
         t_file = get_patient(ser_pat_name, ser_pat_num)
@@ -345,11 +356,11 @@ class UiMainWindow(object):
         msg_box.setIconPixmap(QPixmap("Logo.png"))
         msg_box.setStandardButtons(QMessageBox.NoButton)
         msg_box.show()
-        # self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
+        self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
         msg_box.close()
 
         # Display patient info
-        text = f"\t\tPatient Name:\t\t{string.capwords(pat_name)}\n\t\tPatient Number:\t\t{pat_num}\n\t\tDate of File Creation:\t{date}"
+        text = f"\t\tPatient Name:\t\t\t{string.capwords(pat_name)}\n\t\tPatient Number:\t\t\t{pat_num}\n\t\tDate of File Creation:\t\t{date}"
         self.disp_patient.setText(text)
 
         # Display gif
