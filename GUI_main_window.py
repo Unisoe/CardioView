@@ -1,10 +1,11 @@
 import os
 import string
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QDate
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QMessageBox, QGridLayout
+from PyQt5.QtCore import QDate, Qt
+from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtWidgets import QMessageBox, QGridLayout, QApplication, QDialog, QVBoxLayout, QLabel
 import config
+import popup
 from patient_data_sqlite import new_entry, get_patient
 from popup import NewUserDialog
 import RunProcessing
@@ -64,7 +65,7 @@ class UiMainWindow(object):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        self.setWindowIcon(QtGui.QIcon('Logo.png'))
+        self.setWindowIcon(QtGui.QIcon(os.path.join(config.application_path, "Logo.png")))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.outerLayout = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -279,7 +280,7 @@ class UiMainWindow(object):
 
     def new_pat_info(self):
         # User input
-        if str(self.load_data.text()) or str(self.new_pat_name.text()) or int(self.new_pat_num.text()) == '':
+        if str(self.load_data.text()) == '' or str(self.new_pat_name.text()) == '' or int(self.new_pat_num.text()) == '':
             QMessageBox.about(self, "CardioView", "Please provide all required patient information")
             return
         else:
@@ -290,9 +291,8 @@ class UiMainWindow(object):
             new_entry(load_data, new_pat_name, new_pat_num, new_pat_date)
 
     def new_user_window(self):
-
         self.popup_user_window = NewUserDialog()
-        self.popup_user_window.show()
+        self.popup_user_window.exec_()
 
     def connect_to_model(self): #edithere
         ser = serial.Serial()  # initialize serial communication
@@ -328,7 +328,7 @@ class UiMainWindow(object):
         ser.close()
     def ser_pat_info(self):
         # User input
-        if str(self.ser_pat_name.text()) or str(self.ser_pat_name.text()) == '':
+        if str(self.ser_pat_name.text()) == '' or str(self.ser_pat_name.text()) == '':
             QMessageBox.about(self, "CardioView", "Please fill out all required fields")
             return
         else:
@@ -349,16 +349,12 @@ class UiMainWindow(object):
             m_file = os.path.join(config.patient_file_path, f'{pat_num}.m')
             gif_file = os.path.join(config.patient_file_path, f'{pat_num}.gif')
 
-        # Run Processing
-        msg_box = QMessageBox()
-        msg_box.setText("Patient data is being processed, please wait.")
-        msg_box.setWindowTitle("CardioView")
-        msg_box.setIconPixmap(QPixmap("Logo.png"))
-        msg_box.setStandardButtons(QMessageBox.NoButton)
-        msg_box.show()
-        self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
-        msg_box.close()
 
+        # Run Processing edithere
+        # proc_diag = popup.ProcessingDialog()
+        # proc_diag.show()
+        # self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
+        # proc_diag.close_dialog()
         # Display patient info
         text = f"\t\tPatient Name:\t\t\t{string.capwords(pat_name)}\n\t\tPatient Number:\t\t\t{pat_num}\n\t\tDate of File Creation:\t\t{date}"
         self.disp_patient.setText(text)

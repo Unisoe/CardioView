@@ -63,7 +63,7 @@ def run_processing(patient_data, gif_path, thresh, pat_num):
         ax.set_ylabel('y')
         plt.xlim([-100, 100])
         plt.ylim([-100, 100])
-        ax.set_title('positions')
+        ax.set_title('Local Activation')
         plt.savefig('frame_{0:03d}.png'.format(num))
 
     # Saving the frames as a gif
@@ -75,6 +75,3 @@ def run_processing(patient_data, gif_path, thresh, pat_num):
     imageio.mimsave(gif_path, images, fps=10)
 
     return flattened_data
-
-# call function to run patient_data, gif_path, thresh, pat_num
-# run_processing("C:/Users/krist/PycharmProjects/capscone_sigprocessing_v1/vt1_sample.mat", "C:/Users/krist/PycharmProjects/capscone_sigprocessing_v1/patient_files/123456789.gif", 1, 123456789)
