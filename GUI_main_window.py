@@ -1,4 +1,6 @@
 import os
+import string
+
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, QTimer
@@ -15,6 +17,8 @@ import time
 class UiMainWindow(object):
     def __init__(self):
         super().__init__()
+        self.disp_patient_title = None
+        self.line_disp = None
         self.msg_box = None
         self.pixmap3 = None
         self.pixmap2 = None
@@ -108,7 +112,6 @@ class UiMainWindow(object):
 
         self.thresh_txt = QtWidgets.QLabel(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHeightForWidth(self.thresh_txt.sizePolicy().hasHeightForWidth())
         self.thresh_txt.setSizePolicy(sizePolicy)
         self.thresh_txt.setObjectName("Thresh Label")
         self.rightLayout.addWidget(self.thresh_txt, 10, 2, 1, 1)
@@ -118,6 +121,12 @@ class UiMainWindow(object):
         self.line_get.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_get.setObjectName("line_get")
         self.rightLayout.addWidget(self.line_get, 6, 2, 1, 4)
+
+        self.line_disp = QtWidgets.QFrame(self.centralwidget)
+        self.line_disp.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_disp.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_disp.setObjectName("line_disp")
+        self.rightLayout.addWidget(self.line_get, 11, 2, 1, 4)
 
         self.pat_num_txt1 = QtWidgets.QLabel(self.centralwidget)
         sizePolicy.setHeightForWidth(self.pat_num_txt1.sizePolicy().hasHeightForWidth())
@@ -135,22 +144,15 @@ class UiMainWindow(object):
         self.upload_database = QtWidgets.QPushButton(self.centralwidget)
         self.upload_database.setObjectName("upload_database")
         self.upload_database.clicked.connect(self.new_pat_info)
-        self.rightLayout.addWidget(self.upload_database, 5, 5, 1, 1)  # edithere
+        self.rightLayout.addWidget(self.upload_database, 5, 5, 1, 1)
 
         self.new_pat_data_title = QtWidgets.QLabel(self.centralwidget)
-        font_title = QtGui.QFont()
-        font_title.setBold(True)
-        font_title.setWeight(75)
         self.new_pat_data_title.setFont(font_title)
         self.new_pat_data_title.setAlignment(QtCore.Qt.AlignCenter)
         self.new_pat_data_title.setObjectName("lineEdit_6")
         self.rightLayout.addWidget(self.new_pat_data_title, 1, 2, 1, 4)
 
         self.load_data_txt = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.load_data_txt.sizePolicy().hasHeightForWidth())
         self.load_data_txt.setSizePolicy(sizePolicy)
         self.load_data_txt.setObjectName("lineEdit_5")
         self.rightLayout.addWidget(self.load_data_txt, 2, 2, 1, 1)
@@ -160,10 +162,6 @@ class UiMainWindow(object):
         self.rightLayout.addWidget(self.load_data, 2, 3, 1, 2)
 
         self.new_pat_name_label = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.new_pat_name_label.sizePolicy().hasHeightForWidth())
         self.new_pat_name_label.setSizePolicy(sizePolicy)
         self.new_pat_name_label.setObjectName("lineEdit_8")
         self.rightLayout.addWidget(self.new_pat_name_label, 3, 2, 1, 1)
@@ -174,10 +172,6 @@ class UiMainWindow(object):
         self.rightLayout.addWidget(self.new_pat_name, 3, 3, 1, 3)
 
         self.pat_num2 = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pat_num2.sizePolicy().hasHeightForWidth())
         self.pat_num2.setSizePolicy(sizePolicy)
         self.pat_num2.setObjectName("lineEdit_9")
         self.rightLayout.addWidget(self.pat_num2, 9, 2, 1, 1)
@@ -188,10 +182,6 @@ class UiMainWindow(object):
         self.rightLayout.addWidget(self.new_pat_num, 4, 3, 1, 3)
 
         self.date_txt = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.date_txt.sizePolicy().hasHeightForWidth())
         self.date_txt.setSizePolicy(sizePolicy)
         self.date_txt.setObjectName("lineEdit_1")
         self.rightLayout.addWidget(self.date_txt, 5, 2, 1, 1)
@@ -210,19 +200,25 @@ class UiMainWindow(object):
         self.disp_speed = QtWidgets.QSlider(self.centralwidget)
         self.disp_speed.setOrientation(QtCore.Qt.Horizontal)
         self.disp_speed.setObjectName("Disp Speed Slider")
-        self.disp_speed.setRange(0, 10)
-        self.disp_speed.setValue(5)
+        self.disp_speed.setRange(0, 200)
+        self.disp_speed.setValue(100)
         self.disp_speed.setEnabled(False)
         self.disp_speed.valueChanged.connect(self.slider_value_changed)
         self.leftLayout.addWidget(self.disp_speed, 3, 1, 1, 1)
 
         # Patient info display
+        self.disp_patient_title = QtWidgets.QLabel(self.centralwidget)
+        self.disp_patient_title.setFont(font_title)
+        self.disp_patient_title.setAlignment(QtCore.Qt.AlignCenter)
+        self.disp_patient_title.setObjectName("disp_patient_title")
+        self.rightLayout.addWidget(self.disp_patient_title, 12, 2, 1, 4)
+        
         self.disp_patient = QtWidgets.QLabel(self.centralwidget)
         self.disp_patient.setObjectName("disp_patient")
-        self.rightLayout.addWidget(self.disp_patient, 11, 1, 1, 4) #
+        self.rightLayout.addWidget(self.disp_patient, 13, 1, 1, 4)
 
         # New user button
-        self.new_user = QtWidgets.QPushButton(self.centralwidget)  # edithere
+        self.new_user = QtWidgets.QPushButton(self.centralwidget)
         self.new_user.setObjectName("new_user")
         self.new_user.clicked.connect(self.new_user_window)
         self.leftLayout.addWidget(self.new_user, 1, 1, 1, 1)
@@ -262,9 +258,9 @@ class UiMainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 889, 22))
-
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
+
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
@@ -346,15 +342,14 @@ class UiMainWindow(object):
         msg_box = QMessageBox()
         msg_box.setText("Patient data is being processed, please wait.")
         msg_box.setWindowTitle("CardioView")
-        stylesheet = "QWidget { font_title-size: 15px; }"
-        msg_box.setStyleSheet(stylesheet)
         msg_box.setIconPixmap(QPixmap("Logo.png"))
+        msg_box.setStandardButtons(QMessageBox.NoButton)
         msg_box.show()
         # self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
         msg_box.close()
 
         # Display patient info
-        text = f"Patient Name:  {pat_name}\nPatient Number:  {pat_num}\nDate of File Creation:  {date}"
+        text = f"\t\tPatient Name:\t\t{string.capwords(pat_name)}\n\t\tPatient Number:\t\t{pat_num}\n\t\tDate of File Creation:\t{date}"
         self.disp_patient.setText(text)
 
         # Display gif
@@ -373,11 +368,6 @@ class UiMainWindow(object):
         # Set the speed of the GIF based on the value of the slider
         self.gif.setSpeed(value)
 
-    def updateGIF(self):
-        # Update the label with the next frame of the GIF
-        pixmap = self.disp_graph_gif.pixmap()
-        pixmap = pixmap.copy()
-        self.disp_graph_gif.setPixmap(pixmap)
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "CardioView"))
@@ -395,3 +385,4 @@ class UiMainWindow(object):
         self.pat_num2.setText(_translate("MainWindow", "Patient Number:"))
         self.date_txt.setText(_translate("MainWindow", "Date:"))
         self.file_search.setText(_translate("MainWindow", "File Search"))
+        self.disp_patient_title.setText(_translate("MainWindow", "DISPLAY INFORMATION"))
