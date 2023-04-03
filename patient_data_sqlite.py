@@ -119,14 +119,14 @@ def get_patient(ser_name, num):
 
 def error_popup(text):
     msg_box = QMessageBox()
-    msg_box.setIconPixmap(QPixmap(os.path.join(config.application_path, "Logo.png")))
+    msg_box.setWindowIcon(QPixmap(os.path.join(config.application_path, "Logo.png")))
     msg_box.setWindowTitle("CardioView")
     msg_box.setText(text)
     msg_box.exec_()
 
 def check_overwrite(cursor, conn):
     msg_box = QMessageBox()
-    msg_box.setIconPixmap(QPixmap(os.path.join(config.application_path, "Logo.png")))
+    msg_box.setWindowIcon(QPixmap(os.path.join(config.application_path, "Logo.png")))
     msg_box.setWindowTitle("CardioView")
     msg_box.setText("Data for this patient number already exists in the database. \n\nWould you like to overwrite it?")
     msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)

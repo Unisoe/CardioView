@@ -6,6 +6,11 @@
 6. app packaging
 
 
+1. when login page is closed, app does not stop running, how did you fix that last time?
+2. including .db in build file?
+3. include folder in build file?
+4. or make a desktop shortcut on install
+
 note: for using git:
 1. git add .
 2. git commit -m "comment"
@@ -33,3 +38,5 @@ remove m_file_path and replace it with file path...
            Should probably also make it patient_database_path.
         5. Do similar for user database (make a user_database_path variable).
     '''
+pyinstaller -w -F --add-data "Logo.png;." .\CardioView.py --noconfirm
+pyinstaller -w -F --add-data "Logo.png; patient_database.db; user_database.db;." .\CardioView.py --noconfirm

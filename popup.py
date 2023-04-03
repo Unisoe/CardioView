@@ -40,7 +40,7 @@ class NewUserDialog(QDialog):
         re_password = self.re_password.text()
         accepted = new_user(username, password, re_password)
         msg_box = QMessageBox()
-        msg_box.setIconPixmap(QPixmap(os.path.join(config.application_path, "Logo.png")))
+        msg_box.setWindowIcon(QPixmap(os.path.join(config.application_path, "Logo.png")))
         msg_box.setWindowTitle("CardioView")
 
         # Check database

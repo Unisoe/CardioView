@@ -1,5 +1,7 @@
+import os
 from PyQt5.QtWidgets import QApplication, QDialog, QLineEdit, QPushButton, QVBoxLayout, QLabel, QMessageBox
 from PyQt5 import QtGui
+import config
 from RunUI_main_window import MainWindow
 from user_sqlite import get_user
 import sys
@@ -10,7 +12,7 @@ class LoginDialog(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("CardioView")
-        self.setWindowIcon(QtGui.QIcon("Logo.png"))
+        self.setWindowIcon(QtGui.QIcon(os.path.join(config.application_path, "Logo.png")))
         self.username = QLineEdit(self)
         self.password = QLineEdit(self)
         self.password.setEchoMode(QLineEdit.Password)
@@ -27,7 +29,6 @@ class LoginDialog(QDialog):
         cancel_button.clicked.connect(self.reject)
         stylesheet = "QWidget { font-size: 15px; }"
         self.setStyleSheet(stylesheet)
-        print(self.size())
 
     def login(self):
         username = self.username.text()
@@ -57,4 +58,3 @@ if __name__ == "__main__":
         sys.exit(app.exec_())
     else:
         sys.exit(app.exec_())
-    # sys.exit(app.exec_())
