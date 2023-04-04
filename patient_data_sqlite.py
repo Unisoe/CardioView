@@ -2,7 +2,7 @@ import sqlite3
 import shutil
 import os
 from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QIcon
 import base64
 import config
 from cryptography.fernet import Fernet
@@ -48,15 +48,11 @@ def new_entry(m_file_path, name, number, date):
         if popup_val == 0:
             return
 
-
     # make paths for files (now that we know they don't already exist)
     new_m_file_path = os.path.join(patient_file_path, f'{number}.m')
 
     # Move .m file to app location
     shutil.copyfile(m_file_path, new_m_file_path)
-
-    # Set the file permissions of the subdirectory to read and execute only for the owner
-
 
     # Insert new entry into the table
     cursor.execute('''
@@ -119,14 +115,14 @@ def get_patient(ser_name, num):
 
 def error_popup(text):
     msg_box = QMessageBox()
-    msg_box.setWindowIcon(QPixmap(os.path.join(config.application_path, "Logo.png")))
+    msg_box.setWindowIcon(QIcon(os.path.join(config.application_path, "Logo.png")))
     msg_box.setWindowTitle("CardioView")
     msg_box.setText(text)
     msg_box.exec_()
 
 def check_overwrite(cursor, conn):
     msg_box = QMessageBox()
-    msg_box.setWindowIcon(QPixmap(os.path.join(config.application_path, "Logo.png")))
+    msg_box.setWindowIcon(QIcon(os.path.join(config.application_path, "Logo.png")))
     msg_box.setWindowTitle("CardioView")
     msg_box.setText("Data for this patient number already exists in the database. \n\nWould you like to overwrite it?")
     msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)

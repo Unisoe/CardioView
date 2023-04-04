@@ -13,7 +13,7 @@ def on_startup():
     # Create cursor to execute SQL commands
     cursor_user = conn_user.cursor()
 
-    # Create table 'entries'
+    # Create table 'user'
     cursor_user.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 username BLOB PRIMARY KEY COLLATE BINARY,
@@ -46,7 +46,7 @@ def on_startup():
     # Create a cursor to execute SQL commands
     cursor_pat = conn_pat.cursor()
 
-    # Create table 'entries'
+    # Create table 'patients'
     cursor_pat.execute('''
                 CREATE TABLE IF NOT EXISTS patients (
                     name TEXT,

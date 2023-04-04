@@ -1,17 +1,13 @@
-1. delete .gif files after app closure DONE
-2. encrypt user database and patient database DONE
-3. add overwrite function for patient database
-4. figure out how to make the progress bars work? REMOVED
-5. fix app scaling
-6. app packaging
+TODO:
+when login page is closed, app does not stop running, how did you fix that last time?
+make a desktop shortcut on install
+
+DONE:
+fixed QMessageBox icons
 
 
-1. when login page is closed, app does not stop running, how did you fix that last time?
-2. including .db in build file?
-3. include folder in build file?
-4. or make a desktop shortcut on install
 
-note: for using git:
+note:
 1. git add .
 2. git commit -m "comment"
 3. git push
@@ -19,24 +15,12 @@ note: for using git:
 
 notes:
 what kind of operating system will be used
+'''
 windows 10/11
 can be build for linux/mac by running pyinstaller on one of those OSs
 ram/memory requirements - run and use, monitor task manager. 4GB estimate
 storage - 300MB (not including patient data files)
+'''
 
-
-pyinstaller .\CardioView.py --noconfirm
-
-remove m_file_path and replace it with file path...
-    '''
-        TODO:
-        1. Move creating databases for patient database and user database here (pre-startup)
-        2. Add a user with admin/admin username/pass if it doesn't exist here (pre-startup)
-        3. Remove base path
-        4. Replace database_path to use config.application_path as the root folder
-           (i.e. database_path = path.join(config.application_path, patient_data.db).
-           Should probably also make it patient_database_path.
-        5. Do similar for user database (make a user_database_path variable).
-    '''
 pyinstaller -w -F --add-data "Logo.png;." .\CardioView.py --noconfirm
 pyinstaller -w -F --add-data "Logo.png; patient_database.db; user_database.db;." .\CardioView.py --noconfirm
