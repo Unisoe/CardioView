@@ -1423,5 +1423,45 @@
     <argument id="503" parent="172">
       <Position>1</Position>
     </argument>
+    <table id="504" parent="173" name="patients"/>
+    <table id="505" parent="173" name="sqlite_master">
+      <System>1</System>
+    </table>
+    <column id="506" parent="504" name="name">
+      <DasType>TEXT|0s</DasType>
+      <Position>1</Position>
+    </column>
+    <column id="507" parent="504" name="number">
+      <DasType>INTEGER|0s</DasType>
+      <Position>2</Position>
+    </column>
+    <column id="508" parent="504" name="date">
+      <DasType>TEXT|0s</DasType>
+      <Position>3</Position>
+    </column>
+    <key id="509" parent="504">
+      <ColNames>number</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="510" parent="505" name="type">
+      <DasType>TEXT|0s</DasType>
+      <Position>1</Position>
+    </column>
+    <column id="511" parent="505" name="name">
+      <DasType>TEXT|0s</DasType>
+      <Position>2</Position>
+    </column>
+    <column id="512" parent="505" name="tbl_name">
+      <DasType>TEXT|0s</DasType>
+      <Position>3</Position>
+    </column>
+    <column id="513" parent="505" name="rootpage">
+      <DasType>INT|0s</DasType>
+      <Position>4</Position>
+    </column>
+    <column id="514" parent="505" name="sql">
+      <DasType>TEXT|0s</DasType>
+      <Position>5</Position>
+    </column>
   </database-model>
 </dataSource>

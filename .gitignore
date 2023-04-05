@@ -1,2 +1,7 @@
 build/**
 dist/**
+patient_files/**
+WiredWireless_DONOTUSE.py
+testing_functions.py
+vt1_sample.mat
+.TODO

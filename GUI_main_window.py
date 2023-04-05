@@ -1,21 +1,25 @@
+import csv
 import os
 import string
+import threading
+
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QDate, Qt
+from PyQt5.QtCore import QDate, Qt, QObject, pyqtSignal
 from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtWidgets import QMessageBox, QGridLayout, QApplication, QDialog, QVBoxLayout, QLabel
-import config
-import popup
-from patient_data_sqlite import new_entry, get_patient
-from popup import NewUserDialog
+from PyQt5.QtWidgets import QMessageBox, QGridLayout
+import Config
+import NewUserWindow
+import WiredWireless
+from PatientSQLite import new_entry, get_patient
+from NewUserWindow import NewUserDialog
 import RunProcessing
-import serial
-import time
+from StartCloseFunctions import on_close
 
 
 class UiMainWindow(object):
     def __init__(self):
         super().__init__()
+        self.popup_con_window = None
         self.disp_patient_title = None
         self.line_disp = None
         self.msg_box = None
@@ -65,7 +69,7 @@ class UiMainWindow(object):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        self.setWindowIcon(QtGui.QIcon(os.path.join(config.application_path, "Logo.png")))
+        self.setWindowIcon(QtGui.QIcon(os.path.join(Config.application_path, "Logo.png")))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.outerLayout = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -292,40 +296,13 @@ class UiMainWindow(object):
 
     def new_user_window(self):
         self.popup_user_window = NewUserDialog()
-        self.popup_user_window.exec_()
+        self.popup_user_window.show()
 
-    def connect_to_model(self): #edithere
-        ser = serial.Serial()  # initialize serial communication
-        ser.baudrate = 9600
-        ser.port = None
-        ser.timeout = 1
+    def connect_to_model(self):
+        self.popup_con_window = WiredWireless.ConnectionDialog()
+        self.popup_con_window.show()
 
-        print("Searching for available ports...") # edithere popup
-        time.sleep(1)
 
-        portNames = []  # find available serial ports
-        portCount = 0
-        while True:
-            line = ser.readline().decode().strip()
-            if line.startswith("COM"):
-                portNames.append(line.split(":")[0])
-                print(str(portCount) + ". " + portNames[portCount]) # edithere popup
-                portCount += 1
-            if not ser.inWaiting():
-                break
-
-        selectedPort = -1  # ask user to select a port
-        while selectedPort < 0 or selectedPort >= portCount:
-            selectedPort = int(input("Select a port number (0-" + str(portCount - 1) + "): ")) # edithere popup
-
-        ser.port = portNames[selectedPort]  # connect to the selected port
-        ser.open()
-
-        print("Connected to " + ser.port) # edithere make this into a popup
-
-        matrix = self.send_to_mc,  # single line array
-        ser.write(matrix)
-        ser.close()
     def ser_pat_info(self):
         # User input
         if str(self.ser_pat_name.text()) == '' or str(self.ser_pat_name.text()) == '':
@@ -346,15 +323,19 @@ class UiMainWindow(object):
             return
         else:
             pat_name, pat_num, date = t_file
-            m_file = os.path.join(config.patient_file_path, f'{pat_num}.m')
-            gif_file = os.path.join(config.patient_file_path, f'{pat_num}.gif')
-
+            m_file = os.path.join(Config.patient_file_path, f'{pat_num}.m')
+            gif_file = os.path.join(Config.patient_file_path, f'{pat_num}.gif')
 
         # Run Processing edithere
-        # proc_diag = popup.ProcessingDialog()
-        # proc_diag.show()
-        # self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
-        # proc_diag.close_dialog()
+        # self.run_processing_thread(m_file, gif_file, thresh, pat_num)
+        self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
+        # print(self.send_to_mc)
+        with open('my_array.csv', 'w', newline='') as file:
+            writer = csv.writer(file)
+
+            # write each row of the array to the CSV file
+            for row in self.send_to_mc:
+                writer.writerow(row)
         # Display patient info
         text = f"\t\tPatient Name:\t\t\t{string.capwords(pat_name)}\n\t\tPatient Number:\t\t\t{pat_num}\n\t\tDate of File Creation:\t\t{date}"
         self.disp_patient.setText(text)
@@ -362,11 +343,11 @@ class UiMainWindow(object):
         # Display gif
         self.gif = QtGui.QMovie(gif_file)
         self.disp_graph_gif.setMovie(self.gif)
-        self.pixmap1 = QPixmap(os.path.join(config.patient_file_path, f'{pat_num}16.png'))
+        self.pixmap1 = QPixmap(os.path.join(Config.patient_file_path, f'{pat_num}16.png'))
         self.disp_graph_1.setPixmap(self.pixmap1)
-        self.pixmap2 = QPixmap(os.path.join(config.patient_file_path, f'{pat_num}50.png'))
+        self.pixmap2 = QPixmap(os.path.join(Config.patient_file_path, f'{pat_num}50.png'))
         self.disp_graph_2.setPixmap(self.pixmap2)
-        self.pixmap3 = QPixmap(os.path.join(config.patient_file_path, f'{pat_num}107.png'))
+        self.pixmap3 = QPixmap(os.path.join(Config.patient_file_path, f'{pat_num}107.png'))
         self.disp_graph_3.setPixmap(self.pixmap3)
         self.gif.start()
         self.disp_speed.setEnabled(True)
@@ -374,6 +355,17 @@ class UiMainWindow(object):
     def slider_value_changed(self, value):
         # Set the speed of the GIF based on the value of the slider
         self.gif.setSpeed(value)
+    #
+    # def run_processing_thread(self, m_file, gif_file, thresh, pat_num):
+    #     # create a new thread and connect to its finished signal
+    #     thread = ProcessingThread(m_file, gif_file, thresh, pat_num)
+    #     thread.finished.connect(self.update_result)
+    #
+    #     # start the thread
+    #     thread.start()
+    #
+    # def update_result(self, result):
+    #     self.send_to_mc = result
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -393,3 +385,25 @@ class UiMainWindow(object):
         self.date_txt.setText(_translate("MainWindow", "Date:"))
         self.file_search.setText(_translate("MainWindow", "File Search"))
         self.disp_patient_title.setText(_translate("MainWindow", "DISPLAY INFORMATION"))
+
+#
+# class ProcessingThread(QObject, threading.Thread):
+#     finished = pyqtSignal(int)
+#
+#     def __init__(self, m_file, gif_file, thresh, pat_num):
+#         threading.Thread.__init__(self)
+#         QObject.__init__(self)
+#         self.m_file = m_file
+#         self.gif_file = gif_file
+#         self.thresh = thresh
+#         self.pat_num = pat_num
+#
+#     def run(self):
+#         # create a message box and show it
+#         msgBox = QMessageBox()
+#         msgBox.setText("Function is running...")
+#         msgBox.exec_()
+#
+#         # call processing func function and emit the result
+#         result = RunProcessing.run_processing(self.m_file, self.gif_file, self.thresh, self.pat_num)
+#         self.finished.emit(result)

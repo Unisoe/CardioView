@@ -5,7 +5,7 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
-import config
+import Config
 
 # Use password for key
 hardcode = b"AZBF6223"
@@ -27,7 +27,7 @@ def new_user(username, password, re_password):
     byte_username = bytes(username, 'utf-8')
 
     # Connect to database
-    user_database_path = os.path.join(config.application_path, 'user_database.db')
+    user_database_path = os.path.join(Config.application_path, 'user_database.db')
     conn = sqlite3.connect(user_database_path)
 
     # Create a cursor to execute SQL commands
@@ -88,7 +88,7 @@ def get_user(username, user_password):
     byte_password = bytes(user_password, 'utf-8')
 
     # Connect to database
-    user_database_path = os.path.join(config.application_path, 'user_database.db')
+    user_database_path = os.path.join(Config.application_path, 'user_database.db')
     conn = sqlite3.connect(user_database_path)
 
     # Create cursor to execute SQL commands

@@ -4,7 +4,7 @@ import os
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtGui import QPixmap, QIcon
 import base64
-import config
+import Config
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -26,14 +26,14 @@ f_patient = Fernet(key2)
 
 def new_entry(m_file_path, name, number, date):
     # Connect to database (or create it if it doesn't exist)
-    patient_database_path = os.path.join(config.application_path, 'patient_database.db')
+    patient_database_path = os.path.join(Config.application_path, 'patient_database.db')
     conn = sqlite3.connect(patient_database_path)
 
     # Create a cursor to execute SQL commands
     cursor = conn.cursor()
 
     # Create database path for .m, .gif, and .png files
-    patient_file_path = os.path.join(config.application_path, 'patient_files')
+    patient_file_path = os.path.join(Config.application_path, 'patient_files')
     if not os.path.exists(patient_file_path):
         os.makedirs(patient_file_path, exist_ok=True)
     # If entry already exists return error
@@ -71,7 +71,7 @@ def new_entry(m_file_path, name, number, date):
 
 def get_patient(ser_name, num):
     # Connect to database (or create it if it doesn't exist)
-    patient_database_path = os.path.join(config.application_path, 'patient_database.db')
+    patient_database_path = os.path.join(Config.application_path, 'patient_database.db')
     conn = sqlite3.connect(patient_database_path)
 
     # Create cursor to execute SQL commands
@@ -101,7 +101,7 @@ def get_patient(ser_name, num):
     name = f_patient.decrypt(name_e)
     date = f_patient.decrypt(date_e)
 
-    if ser_name != name.decode('utf-8'):
+    if ser_name.lower() != name.decode('utf-8').lower():
         error_popup("This patient does not exist.")
         cursor.close()
         conn.close()
@@ -113,16 +113,16 @@ def get_patient(ser_name, num):
 
     return name.decode('utf-8'), num, date.decode('utf-8')
 
-def error_popup(text):
+def error_popup(text): #edithere
     msg_box = QMessageBox()
-    msg_box.setWindowIcon(QIcon(os.path.join(config.application_path, "Logo.png")))
+    msg_box.setWindowIcon(QIcon(os.path.join(Config.application_path, "Logo.png")))
     msg_box.setWindowTitle("CardioView")
     msg_box.setText(text)
     msg_box.exec_()
 
 def check_overwrite(cursor, conn):
     msg_box = QMessageBox()
-    msg_box.setWindowIcon(QIcon(os.path.join(config.application_path, "Logo.png")))
+    msg_box.setWindowIcon(QIcon(os.path.join(Config.application_path, "Logo.png")))
     msg_box.setWindowTitle("CardioView")
     msg_box.setText("Data for this patient number already exists in the database. \n\nWould you like to overwrite it?")
     msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)

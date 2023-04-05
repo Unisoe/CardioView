@@ -1,5 +1,5 @@
 import os
-import config
+import Config
 import numpy as np
 import scipy as sc
 import matplotlib.pyplot as plt
@@ -220,7 +220,7 @@ def processing(ecg, fs, user_thresh, electrode_num, pat_num):
                       handler_map={mpatches.Circle: HandlerEllipse()})
 
         # Save fig
-        png_path = os.path.join(config.patient_file_path, f'{pat_num}{electrode_num}.png')
+        png_path = os.path.join(Config.patient_file_path, f'{pat_num}{electrode_num}.png')
         plt.savefig(png_path)
 
     # create binary array

@@ -1,6 +1,7 @@
 import sys
 from PyQt5 import QtWidgets, QtGui
 from GUI_main_window import UiMainWindow
+from StartCloseFunctions import on_close
 
 
 class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
@@ -11,4 +12,5 @@ class MainWindow(QtWidgets.QMainWindow, UiMainWindow):
         self.setStyleSheet(stylesheet)
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        on_close()
         sys.exit()

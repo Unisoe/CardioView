@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from processing import processing
+from Processing import processing
 from mat4py import loadmat
 import matplotlib.pyplot as plt
 import imageio.v2 as imageio
