@@ -1,6 +1,4 @@
 import os
-# import bluetooth
-# import serial
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QPushButton
 import Config

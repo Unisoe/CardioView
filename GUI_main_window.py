@@ -1,11 +1,9 @@
-import csv
+
 import os
 import string
-import threading
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QDate, Qt, QObject, pyqtSignal
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtCore import QDate
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox, QGridLayout
 import Config
 import NewUserWindow
@@ -13,7 +11,6 @@ import WiredWireless
 from PatientSQLite import new_entry, get_patient
 from NewUserWindow import NewUserDialog
 import RunProcessing
-from StartCloseFunctions import on_close
 
 
 class UiMainWindow(object):
@@ -302,7 +299,6 @@ class UiMainWindow(object):
         self.popup_con_window = WiredWireless.ConnectionDialog()
         self.popup_con_window.show()
 
-
     def ser_pat_info(self):
         # User input
         if str(self.ser_pat_name.text()) == '' or str(self.ser_pat_name.text()) == '':
@@ -326,16 +322,9 @@ class UiMainWindow(object):
             m_file = os.path.join(Config.patient_file_path, f'{pat_num}.m')
             gif_file = os.path.join(Config.patient_file_path, f'{pat_num}.gif')
 
-        # Run Processing edithere
-        # self.run_processing_thread(m_file, gif_file, thresh, pat_num)
+        # Run Processing
         self.send_to_mc = RunProcessing.run_processing(m_file, gif_file, thresh, pat_num)
-        # print(self.send_to_mc)
-        with open('my_array.csv', 'w', newline='') as file:
-            writer = csv.writer(file)
 
-            # write each row of the array to the CSV file
-            for row in self.send_to_mc:
-                writer.writerow(row)
         # Display patient info
         text = f"\t\tPatient Name:\t\t\t{string.capwords(pat_name)}\n\t\tPatient Number:\t\t\t{pat_num}\n\t\tDate of File Creation:\t\t{date}"
         self.disp_patient.setText(text)
@@ -355,17 +344,6 @@ class UiMainWindow(object):
     def slider_value_changed(self, value):
         # Set the speed of the GIF based on the value of the slider
         self.gif.setSpeed(value)
-    #
-    # def run_processing_thread(self, m_file, gif_file, thresh, pat_num):
-    #     # create a new thread and connect to its finished signal
-    #     thread = ProcessingThread(m_file, gif_file, thresh, pat_num)
-    #     thread.finished.connect(self.update_result)
-    #
-    #     # start the thread
-    #     thread.start()
-    #
-    # def update_result(self, result):
-    #     self.send_to_mc = result
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -385,25 +363,3 @@ class UiMainWindow(object):
         self.date_txt.setText(_translate("MainWindow", "Date:"))
         self.file_search.setText(_translate("MainWindow", "File Search"))
         self.disp_patient_title.setText(_translate("MainWindow", "DISPLAY INFORMATION"))
-
-#
-# class ProcessingThread(QObject, threading.Thread):
-#     finished = pyqtSignal(int)
-#
-#     def __init__(self, m_file, gif_file, thresh, pat_num):
-#         threading.Thread.__init__(self)
-#         QObject.__init__(self)
-#         self.m_file = m_file
-#         self.gif_file = gif_file
-#         self.thresh = thresh
-#         self.pat_num = pat_num
-#
-#     def run(self):
-#         # create a message box and show it
-#         msgBox = QMessageBox()
-#         msgBox.setText("Function is running...")
-#         msgBox.exec_()
-#
-#         # call processing func function and emit the result
-#         result = RunProcessing.run_processing(self.m_file, self.gif_file, self.thresh, self.pat_num)
-#         self.finished.emit(result)
