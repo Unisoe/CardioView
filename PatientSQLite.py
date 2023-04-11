@@ -32,10 +32,6 @@ def new_entry(m_file_path, name, number, date):
     # Create a cursor to execute SQL commands
     cursor = conn.cursor()
 
-    # Create database path for .m, .gif, and .png files
-    patient_file_path = os.path.join(Config.application_path, 'patient_files')
-    if not os.path.exists(patient_file_path):
-        os.makedirs(patient_file_path, exist_ok=True)
     # If entry already exists return error
     cursor.execute('''
                     SELECT COUNT(*) FROM patients
@@ -49,7 +45,7 @@ def new_entry(m_file_path, name, number, date):
             return
 
     # make paths for files (now that we know they don't already exist)
-    new_m_file_path = os.path.join(patient_file_path, f'{number}.m')
+    new_m_file_path = os.path.join(Config.patient_file_path, f'{number}.m')
 
     # Move .m file to app location
     shutil.copyfile(m_file_path, new_m_file_path)

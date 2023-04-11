@@ -1,11 +1,10 @@
-import glob
 import os
 import sqlite3
+import ctypes
 import Config
 from UserSQLite import new_user
 
 def on_startup():
-
     # Connect to user database (or create it if it doesn't exist)
     user_database_path = os.path.join(Config.application_path, 'user_database.db')
     conn_user = sqlite3.connect(user_database_path)
@@ -34,14 +33,17 @@ def on_startup():
     cursor_user.close()
     conn_user.close()
 
+    '''PATIENT DATABASE'''
+
     # Connect to patient database (or create it if it doesn't exist)
     patient_database_path = os.path.join(Config.application_path, 'patient_database.db')
     conn_pat = sqlite3.connect(patient_database_path)
 
-    # Create database path for .m, .gif, and .png files
-    patient_file_path = os.path.join(Config.application_path, 'patient_files')
-    if not os.path.exists(patient_file_path):
-        os.makedirs(patient_file_path, exist_ok=True)
+    # Create folder path for .m, .gif, and .png files
+    if not os.path.exists(Config.patient_file_path):
+        os.makedirs(Config.patient_file_path, exist_ok=True)
+        FILE_ATTRIBUTE_HIDDEN = 0x02
+        ret = ctypes.windll.kernel32.SetFileAttributesW(Config.patient_file_path, FILE_ATTRIBUTE_HIDDEN)
 
     # Create a cursor to execute SQL commands
     cursor_pat = conn_pat.cursor()
@@ -61,7 +63,7 @@ def on_startup():
 
 def on_close():
     # Remove the .gif files created
-    path = os.listdir(Config.patient_file_path)
+    path = os.listdir(Config.patient_file_path,)
     for images in path:
         if images.endswith(".png") or images.endswith(".gif"):
             os.remove(os.path.join(Config.patient_file_path, images))

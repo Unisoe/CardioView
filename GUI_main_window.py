@@ -301,7 +301,7 @@ class UiMainWindow(object):
 
     def ser_pat_info(self):
         # User input
-        if str(self.ser_pat_name.text()) == '' or str(self.ser_pat_name.text()) == '':
+        if str(self.ser_pat_num.text()) == '' or str(self.ser_pat_name.text()) == '':
             QMessageBox.about(self, "CardioView", "Please fill out all required fields")
             return
         else:

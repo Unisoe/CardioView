@@ -2,6 +2,7 @@ import os
 import Config
 import numpy as np
 import scipy as sc
+from scipy import signal
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.lines as Line2D
@@ -49,8 +50,8 @@ def processing(ecg, fs, user_thresh, electrode_num, pat_num):
     nyq = 0.5 * fs
     low = f1 / nyq
     high = f2 / nyq
-    b, a = sc.signal.butter(n, [low, high], 'bandpass')
-    ecg_butt = sc.signal.filtfilt(b, a, ecg)
+    b, a = signal.butter(n, [low, high], btype = 'band')
+    ecg_butt = signal.filtfilt(b, a, ecg)
     ecg_butt = ecg_butt / max(np.absolute(ecg_butt))
 
     '''derivative filter'''
