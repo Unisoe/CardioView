@@ -1,46 +1,14 @@
 import os
-import threading
-
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMessageBox
-
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel
 import Config
-import RunProcessing
+from PyQt5.QtGui import QIcon
 
-
-class ProcessingThread(threading.Thread):
-    def __init__(self, m_file, gif_file, thresh, pat_num):
-        threading.Thread.__init__(self)
-        self.m_file = m_file
-        self.gif_file = gif_file
-        self.thresh = thresh
-        self.pat_num = pat_num
-        self.result = None
-
-    def run(self):
-        print("the thread has run")
-        self.result = "hello this does in fact work"
-        print("self.result exists")
-        return
-        # self.result = RunProcessing.run_processing(self.m_file, self.gif_file, self.thresh, self.pat_num)
-
-    def get_result(self):
-        return self.result
-
-
-class MsgBoxThread(threading.Thread):
+class WaitDialog(QDialog):
     def __init__(self):
         super().__init__()
-        self.msg_box = None
-
-    def run(self):
-        self.msg_box = QMessageBox()
-        self.msg_box.setWindowIcon(QIcon(os.path.join(Config.application_path, "Logo.png")))
-        self.msg_box.setWindowTitle("CardioView")
-        self.msg_box.setText("Please wait. Patient data is being processed.")
-        self.msg_box.setStandardButtons(QMessageBox.NoButton)
-        self.msg_box.exec_()
-        a=1
-        
-    def closemsg(self):
-        self.msg_box.close()
+        self.setWindowTitle("CardioView")
+        self.setWindowIcon(QIcon(os.path.join(Config.application_path, "Logo.png")))
+        layout = QVBoxLayout(self)
+        layout.addWidget(QLabel("Please wait, patient send_to_mc is being processed."))
+        stylesheet = "QWidget { font-size: 15px; }"
+        self.setStyleSheet(stylesheet)

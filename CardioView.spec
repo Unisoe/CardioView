@@ -32,24 +32,22 @@ exe = EXE(
     strip=False,
     upx=True,
     console=False,
-    icon='Logo.png',
+    icon='Logo_icon.ico',
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
 )
-desktop = [
-    ("CardioView",           # Name
-     "Logo.png",      # Icon
-     "CardioView"),         # Comment
-]
+
+icon_path = 'Logo_icon.ico'
+desktop_icon = [("CardioView", icon_path, '.')]
+
 coll = COLLECT(
     exe,
-    [('resources', '.'), desktop],
     a.binaries,
     a.zipfiles,
-    a.datas,
+    a.datas + desktop_icon,
     strip=False,
     upx=True,
     upx_exclude=[],

@@ -17,7 +17,7 @@ def run_processing(patient_data, gif_path, thresh, pat_num):
     x_coord = np.zeros(112)
     y_coord = np.zeros(112)
 
-    # Put data into variables
+    # Put send_to_mc into variables
     for n in range(start_range, end_range):
         x_coord[n] = np.array(ecg['elec_array']['chan'][n]['x'])
         y_coord[n] = np.array(ecg['elec_array']['chan'][n]['y'])
@@ -43,12 +43,17 @@ def run_processing(patient_data, gif_path, thresh, pat_num):
     for i in range(0, len(send_to_mc_2[0]), ms):
         for j in range(112):
             if np.any(send_to_mc_2[j, i:i + ms]):
-                downsample[j, i // ms] = 1.0
+                downsample[j, i // ms] = 1
             else:
-                downsample[j, i // ms] = 0.0
+                downsample[j, i // ms] = 0
 
-    # Convert matrix to array to be sent to microcontroller
-    flattened_data = downsample.flatten(order='C')
+    # Convert matrix to array of strings to be sent to microcontroller
+    array_of_strings = []
+    transposed_downsample = zip(*downsample)
+    for row in transposed_downsample:
+        row_string = ''.join([str(elem) for elem in row])
+        array_of_strings.append(row_string[:len(downsample[0])])
+
 
     # Plotting
     fig, ax = plt.subplots()
@@ -74,4 +79,5 @@ def run_processing(patient_data, gif_path, thresh, pat_num):
 
     imageio.mimsave(gif_path, images, fps=10)
 
-    return flattened_data
+    return array_of_strings
+

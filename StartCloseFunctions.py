@@ -63,7 +63,7 @@ def on_startup():
 
 def on_close():
     # Remove the .gif files created
-    path = os.listdir(Config.patient_file_path,)
+    path = os.listdir(Config.patient_file_path)
     for images in path:
         if images.endswith(".png") or images.endswith(".gif"):
             os.remove(os.path.join(Config.patient_file_path, images))

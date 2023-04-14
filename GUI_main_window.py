@@ -1,12 +1,10 @@
-
 import os
 import string
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QDate
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QMessageBox, QGridLayout
 import Config
-import NewUserWindow
 import WiredWireless
 from PatientSQLite import new_entry, get_patient
 from NewUserWindow import NewUserDialog
@@ -16,6 +14,8 @@ import RunProcessing
 class UiMainWindow(object):
     def __init__(self):
         super().__init__()
+        self.send_to_mc = None
+        self.popup_wait_window = None
         self.popup_con_window = None
         self.disp_patient_title = None
         self.line_disp = None
@@ -31,7 +31,6 @@ class UiMainWindow(object):
         self.resizing = None
         self.gif = None
         self.popup_user_window = None
-        self.send_to_mc = None
         self.new_user = None
         self.centralwidget = None
         self.connect_mc = None
@@ -72,7 +71,7 @@ class UiMainWindow(object):
         self.outerLayout = QtWidgets.QHBoxLayout(self.centralwidget)
         self.outerLayout.setObjectName("outerLayout")
 
-        stylesheet = "QWidget { font_title-size: 15px; }"
+        stylesheet = "QWidget { font-size: 15px; }"
         self.centralwidget.setStyleSheet(stylesheet)
         self.leftLayout = QGridLayout()
         self.rightLayout = QGridLayout()
@@ -99,6 +98,7 @@ class UiMainWindow(object):
         self.connect_mc = QtWidgets.QPushButton(self.centralwidget)
         self.connect_mc.setObjectName("connect_mc")
         self.connect_mc.clicked.connect(self.connect_to_model)
+        self.connect_mc.setEnabled(False)
         self.rightLayout.addWidget(self.connect_mc, 10, 5, 1, 1)
 
         self.get_pat_data_title = QtWidgets.QLabel(self.centralwidget)
@@ -296,8 +296,8 @@ class UiMainWindow(object):
         self.popup_user_window.show()
 
     def connect_to_model(self):
-        self.popup_con_window = WiredWireless.ConnectionDialog()
-        self.popup_con_window.show()
+        popup_con_window = WiredWireless.ConnectionDialog(self.send_to_mc)
+        popup_con_window.show()
 
     def ser_pat_info(self):
         # User input
@@ -340,6 +340,7 @@ class UiMainWindow(object):
         self.disp_graph_3.setPixmap(self.pixmap3)
         self.gif.start()
         self.disp_speed.setEnabled(True)
+        self.connect_mc.setEnabled(True)
 
     def slider_value_changed(self, value):
         # Set the speed of the GIF based on the value of the slider
