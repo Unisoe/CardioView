@@ -74,7 +74,7 @@ def processing(ecg, fs, user_thresh, electrode_num, pat_num):
     ecg_moving_avg = np.diff(ecg_moving_avg)
 
     '''fiducial mark'''
-    locs, properties = sc.signal.find_peaks(ecg_moving_avg, distance=round(0.2 * fs))
+    locs, properties = sc.signal.find_peaks(ecg_moving_avg[3:], distance=round(0.2 * fs))
 
     '''training phase'''
     sig_thresh = (max(ecg_moving_avg[0:fs])) / 3
@@ -175,7 +175,7 @@ def processing(ecg, fs, user_thresh, electrode_num, pat_num):
             noise_c = np.append(noise_c, ecg_moving_avg[locs[i]])
             noise_i = np.append(noise_i, locs[i])
             noise_lvl1 = 0.125 * y_i + 0.875 * noise_lvl1  # adjust noise in filt sig
-            noise_lvl = 0.125 * ecg_moving_avg[locs[i]] + 0.875 * noise_lvl  # adjuse noise in MVI
+            noise_lvl = 0.125 * ecg_moving_avg[locs[i]] + 0.875 * noise_lvl  # adjust noise in MVI
         if (noise_lvl != 0) or (sig_lvl != 0):
             sig_thresh = noise_lvl + 0.4 * (np.abs(sig_lvl - noise_lvl))
             noise_thresh = 0.5 * sig_thresh
@@ -193,6 +193,8 @@ def processing(ecg, fs, user_thresh, electrode_num, pat_num):
         skip = 0
         not_noise = 0
         ser_back = 0
+
+    # 32, 34, 37, 38, 40, 43, 44, 51, 53, 55, 56, 90, 93
 
     if electrode_num == 16 or electrode_num == 50 or electrode_num == 107:
         # plotting
@@ -213,7 +215,9 @@ def processing(ecg, fs, user_thresh, electrode_num, pat_num):
             plt.plot(x_vals, y_vals_n, linewidth=2, color='r', linestyle='--')
             plt.plot(x_vals, y_vals_s, linewidth=2, color='m', linestyle='-.')
             plt.plot(x_vals, y_vals_t, linewidth=2, color='g', linestyle='-.')
-        plt.scatter(let_i.astype(int), let_c, c='k', s=20)
+        let_i = [int(i) for i in let_i]
+        plt.scatter(let_i, let_c, c='k', s=20)
+        plt.title(f"{electrode_num}")
 
         # add legend
         plt.legend(handles=[r_label, m_label, g_label, k_vert],
@@ -233,6 +237,3 @@ def processing(ecg, fs, user_thresh, electrode_num, pat_num):
 
     return send_to_mc
 
-
-
-    '''update activation rate'''

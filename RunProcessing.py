@@ -80,4 +80,3 @@ def run_processing(patient_data, gif_path, thresh, pat_num):
     imageio.mimsave(gif_path, images, fps=10)
 
     return array_of_strings
-

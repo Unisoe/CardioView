@@ -1,4 +1,6 @@
 import os
+import time
+
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QPushButton, QMessageBox
 import Config
@@ -82,15 +84,22 @@ class ConnectionDialog(QDialog):
         msg_box.exec_()
 
     @staticmethod
-    def wired_connection():
+    def wired_connection(send_to_mc):
+        num = len(send_to_mc)
         def wired_run():
-            port = '/dev/cu.usbmodem14101'
-            arduinoData = serial.Serial(port, 115200)
+            ser = serial.Serial('/dev/cu.usbserial-1410', 9600, timeout=.1)
+            time.sleep(2)  # give the connection a second to settle
 
-            while True:
-                cmd = input('Enter your command: ')
-                cmd = cmd + '\r'
-                arduinoData.write(cmd.encode())
+            for i in range(num):
+                matrix = send_to_mc[i]
+                ser.write(matrix.encode())
+                ser.write(b'\n')
+            # Wait for Arduino to receive and process message
+            time.sleep(1)
+
+            # Close serial connection
+            ser.close()
+
         wired_run()
         msg_box = QMessageBox()
         msg_box.setWindowIcon(QIcon(os.path.join(Config.application_path, "Logo.png")))
